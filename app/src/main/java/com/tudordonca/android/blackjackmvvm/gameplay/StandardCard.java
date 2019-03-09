@@ -18,6 +18,11 @@ public class StandardCard implements Card {
         return toString();
     }
 
+    public Face getFace(){
+        return face;
+    }
+
+
     public String toString(){
         String name = "";
         switch(face) {

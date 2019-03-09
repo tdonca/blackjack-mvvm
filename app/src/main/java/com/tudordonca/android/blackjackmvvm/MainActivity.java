@@ -7,14 +7,17 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
-import java.util.ArrayList;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    private final String LOG_TAG = "MainActivity";
     private GameViewModel viewModel;
     private TextView dealerCards;
     private TextView playerCards;
@@ -44,20 +47,20 @@ public class MainActivity extends AppCompatActivity {
         viewModel.init();
 
         // setup dealer hand observer
-        viewModel.getDealerHand().observe(this, new Observer<ArrayList<String>>() {
+        viewModel.getDealerHand().observe(this, new Observer<List<String>>() {
             @Override
-            public void onChanged(ArrayList<String> strings) {
-                //TODO: change UI for dealer hand here
-                showDealerCards(strings);
+            public void onChanged(List<String> strings) {
+                Log.i(LOG_TAG, "Dealer hand display has changed, updating view...");
+                showCards(strings, dealerCards);
             }
         });
 
         // setup player hand observer
-        viewModel.getPlayerHand().observe(this, new Observer<ArrayList<String>>() {
+        viewModel.getPlayerHand().observe(this, new Observer<List<String>>() {
             @Override
-            public void onChanged(ArrayList<String> strings) {
-                //TODO: change UI here
-                showPlayerCards(strings);
+            public void onChanged(List<String> strings) {
+                Log.i(LOG_TAG, "User hand display has changed, updating view...");
+                showCards(strings, playerCards);
             }
         });
     }
@@ -87,23 +90,15 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void showDealerCards(ArrayList<String> cards){
+    public void showCards(List<String> cards, TextView view){
         StringBuilder cardsString = new StringBuilder();
         for(String c : cards){
             cardsString.append(c).append(" ");
         }
 
-        dealerCards.setText(cardsString.toString());
+        view.setText(cardsString.toString());
     }
 
-    public void showPlayerCards(ArrayList<String> cards){
-        StringBuilder cardsString = new StringBuilder();
-        for(String c : cards){
-            cardsString.append(c).append(" ");
-        }
-
-        playerCards.setText(cardsString.toString());
-    }
 
 
 }

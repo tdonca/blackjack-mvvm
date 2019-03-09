@@ -1,33 +1,39 @@
 package com.tudordonca.android.blackjackmvvm;
 
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 
-import java.util.ArrayList;
+
+import com.tudordonca.android.blackjackmvvm.gameplay.GameExecution;
+
+import java.util.List;
 
 public class GameRepository {
-    private ArrayList<String> dealerHand;
-    private ArrayList<String> playerHand;
+    private GameExecution game;
+    private LiveData<List<String>> dealerHand;
+    private LiveData<List<String>> userHand;
 
     public GameRepository(){
-        dealerHand = new ArrayList<>();
-        dealerHand.add("7Diamonds");
-        dealerHand.add("10Clubs");
+        game = new GameExecution();
 
-        playerHand = new ArrayList<>();
-        playerHand.add("2Hearts");
-        playerHand.add("3Spades");
     }
 
-    public LiveData<ArrayList<String>> getDealerHand(){
-        final MutableLiveData<ArrayList<String>> dh = new MutableLiveData<>();
-        dh.setValue(dealerHand);
-        return dh;
+    public void init(){
+        if(dealerHand == null){
+            dealerHand = game.getDealerHandDisplay();
+        }
+        if(userHand == null){
+            userHand = game.getUserHandDisplay();
+        }
+
+        //TODO: replace with user input
+        game.startRound();
     }
 
-    public LiveData<ArrayList<String>> getPlayerHand(){
-        final MutableLiveData<ArrayList<String>> ph = new MutableLiveData<>();
-        ph.setValue(playerHand);
-        return ph;
+    public LiveData<List<String>> getDealerHand(){
+        return dealerHand;
+    }
+
+    public LiveData<List<String>> getPlayerHand(){
+        return userHand;
     }
 }

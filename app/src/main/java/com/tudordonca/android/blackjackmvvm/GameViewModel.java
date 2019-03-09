@@ -4,15 +4,17 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class GameViewModel extends ViewModel {
 
     private GameRepository gameRepository;
-    private LiveData<ArrayList<String>> dealerHand;
-    private LiveData<ArrayList<String>> playerHand;
+    private LiveData<List<String>> dealerHand;
+    private LiveData<List<String>> playerHand;
 
     public GameViewModel(){
-        this.gameRepository = new GameRepository();
+        gameRepository = new GameRepository();
+        gameRepository.init();
     }
 
 
@@ -26,11 +28,11 @@ public class GameViewModel extends ViewModel {
     }
 
 
-    public LiveData<ArrayList<String>> getDealerHand(){
+    public LiveData<List<String>> getDealerHand(){
         return dealerHand;
     }
 
-    public LiveData<ArrayList<String>> getPlayerHand(){
+    public LiveData<List<String>> getPlayerHand(){
         return playerHand;
     }
 }
