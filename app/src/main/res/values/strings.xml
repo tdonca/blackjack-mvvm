@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">BlackjackMVVM</string>
+    <string name="action_settings">Settings</string>
+    <string name="dealer_hand_title">Dealer Hand</string>
+    <string name="player_hand_title">Player Hand</string>
+    <string name="player_cards_text">player cards</string>
+    <string name="dealer_cards_text">dealer cards</string>
+    <string name="button_hit_text">HIT</string>
+    <string name="button_stay_text">STAY</string>
+</resources>
