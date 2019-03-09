@@ -14,8 +14,11 @@ public class GameExecution {
     private Player user;
     private int dealerHandValue;
     private int userHandValue;
-    MutableLiveData<List<String>> dealerHandDisplay;
-    MutableLiveData<List<String>> userHandDisplay;
+    private boolean userTurn;
+    private MutableLiveData<List<String>> dealerHandDisplay;
+    private MutableLiveData<List<String>> userHandDisplay;
+    private MutableLiveData<String> winnerDisplay;
+
 
 
     public GameExecution(){
@@ -24,32 +27,33 @@ public class GameExecution {
         user = new UserPlayer();
         dealerHandValue = 0;
         userHandValue = 0;
+        userTurn = false;
         dealerHandDisplay = new MutableLiveData<>();
-        dealerHandDisplay.setValue(dealer.getCardsDisplay());
         userHandDisplay = new MutableLiveData<>();
-        userHandDisplay.setValue(user.getCardsDisplay());
+        winnerDisplay = new MutableLiveData<>();
+        ruleSet = new StandardRuleSet();
+
 
     }
 
     public void startRound(){
-
         dealer.clearCards();
+        dealerHandValue = 0;
         user.clearCards();
-
+        userHandValue = 0;
         dealCards();
 
-        evaluateCards();
-
-//            waitForPlayer();
-//
-//            waitForDealer();
-//
-//            finishRound();
-
-
+        if(userHandValue == 21){
+            Log.d(LOG_TAG, "USER BLACKJACK!");
+            userTurn = false;
+            finishRound();
+        }
+        else{
+            userTurn = true;
+        }
     }
 
-    void dealCards(){
+    private void dealCards(){
         Log.i(LOG_TAG, "Dealing cards to the user...");
         user.addCard(deck.drawCard());
         user.addCard(deck.drawCard());
@@ -62,9 +66,10 @@ public class GameExecution {
 
         dealerHandDisplay.setValue(dealer.getCardsDisplay());
         userHandDisplay.setValue(user.getCardsDisplay());
+        evaluateCards();
     }
 
-    void evaluateCards(){
+    private void evaluateCards(){
         dealerHandValue = ruleSet.getValue(dealer.getCards());
         Log.i(LOG_TAG, "Dealer's hand value: " + dealerHandValue);
 
@@ -72,16 +77,40 @@ public class GameExecution {
         Log.i(LOG_TAG, "User's hand value: " + userHandValue);
     }
 
-    void waitForPlayer(){
 
+    private void dealerTurn(){
+        while(dealerHandValue < 17){
+            Log.i(LOG_TAG, "Dealer hits, getting a new card...");
+            dealer.addCard(deck.drawCard());
+            dealerHandDisplay.setValue(dealer.getCardsDisplay());
+            Log.i(LOG_TAG, "Dealer has " + dealer.getCards().size() + " cards: " + dealer.getCards().toString());
+            evaluateCards();
+        }
+
+        if(dealerHandValue > 21){
+            Log.i(LOG_TAG, "DEALER BUST!");
+        }
+
+        finishRound();
     }
 
-    void waitForDealer(){
-
-    }
-
-    void finishRound(){
-
+    private void finishRound(){
+        if(userHandValue > 21){
+            Log.i(LOG_TAG, "DEALER WINS!");
+            winnerDisplay.setValue("DEALER");
+        }
+        else if(dealerHandValue > 21){
+            Log.i(LOG_TAG, "USER WINS!");
+            winnerDisplay.setValue("USER");
+        }
+        else if(dealerHandValue >= userHandValue){
+            Log.i(LOG_TAG, "DEALER WINS!");
+            winnerDisplay.setValue("DEALER");
+        }
+        else{
+            Log.i(LOG_TAG, "USER WINS!");
+            winnerDisplay.setValue("USER");
+        }
     }
 
 
@@ -93,4 +122,40 @@ public class GameExecution {
         return userHandDisplay;
     }
 
+    public LiveData<String> getWinnerDisplay() {
+        return winnerDisplay;
+    }
+
+    public void userHit(){
+        if(userTurn){
+            Log.i(LOG_TAG, "User hits, getting a new card...");
+            user.addCard(deck.drawCard());
+            userHandDisplay.setValue(user.getCardsDisplay());
+            Log.i(LOG_TAG, "User has " + user.getCards().size() + " cards: " + user.getCards().toString());
+            evaluateCards();
+
+            if(userHandValue > 21){
+                Log.i(LOG_TAG, "USER BUST!");
+                userTurn = false;
+                finishRound();
+            }
+        }
+        else{
+            Log.e(LOG_TAG, "Not the user's turn right now!");
+        }
+
+    }
+
+    public void userStay(){
+        if(userTurn){
+            Log.i(LOG_TAG, "User stays, moving to dealer's turn...");
+            userTurn = false;
+            dealerTurn();
+        }
+        else{
+            Log.e(LOG_TAG, "Not the user's turn right now!");
+        }
+
+
+    }
 }

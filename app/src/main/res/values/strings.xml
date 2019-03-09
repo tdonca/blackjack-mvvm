@@ -7,4 +7,6 @@
     <string name="dealer_cards_text">dealer cards</string>
     <string name="button_hit_text">HIT</string>
     <string name="button_stay_text">STAY</string>
+    <string name="button_new_round_text">NEW ROUND</string>
+    <string name="winner_display_text">NO WINNER</string>
 </resources>

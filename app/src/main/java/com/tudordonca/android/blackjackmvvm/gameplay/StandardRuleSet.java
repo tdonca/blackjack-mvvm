@@ -2,9 +2,11 @@ package com.tudordonca.android.blackjackmvvm.gameplay;
 
 import java.util.List;
 
+
+//TODO: convert to singleton
 public class StandardRuleSet {
 
-    static int getValue(List<Card> hand){
+    public int getValue(List<Card> hand){
         int value = 0;
         int numAces = 0;
         for (Card c : hand){
@@ -23,7 +25,7 @@ public class StandardRuleSet {
     }
 
 
-    static int getValue(StandardCard card){
+    public int getValue(StandardCard card){
         switch(card.getFace()){
             case TWO: return 2;
             case THREE: return 3;

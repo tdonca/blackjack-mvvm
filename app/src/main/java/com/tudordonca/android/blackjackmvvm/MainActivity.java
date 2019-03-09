@@ -3,14 +3,14 @@ package com.tudordonca.android.blackjackmvvm;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.TextView;
 
 
@@ -19,8 +19,15 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     private final String LOG_TAG = "MainActivity";
     private GameViewModel viewModel;
+    private TextView dealerTitle;
+    private TextView playerTitle;
     private TextView dealerCards;
     private TextView playerCards;
+    private TextView winnerDisplay;
+    private Button buttonHit;
+    private Button buttonStay;
+    private Button buttonNewRound;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,18 +36,58 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        // find UI elements
+        dealerTitle = findViewById(R.id.dealer_hand_title);
+        playerTitle = findViewById(R.id.player_hand_title);
+        dealerCards = findViewById(R.id.dealer_cards_text);
+        playerCards = findViewById(R.id.player_cards_text);
+        winnerDisplay = findViewById(R.id.winner_display_text);
+        buttonHit = findViewById(R.id.button_hit);
+        buttonStay = findViewById(R.id.button_stay);
+        buttonNewRound = findViewById(R.id.button_new_round);
+
+        // hide UI elements
+        dealerTitle.setVisibility(View.INVISIBLE);
+        playerTitle.setVisibility(View.INVISIBLE);
+        dealerCards.setVisibility(View.INVISIBLE);
+        playerCards.setVisibility(View.INVISIBLE);
+        winnerDisplay.setVisibility(View.INVISIBLE);
+        buttonHit.setVisibility(View.INVISIBLE);
+        buttonStay.setVisibility(View.INVISIBLE);
+
+
+        buttonHit.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                viewModel.onUserHit();
+            }
+        });
+        buttonStay.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                viewModel.onUserStay();
+            }
+        });
+        buttonNewRound.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+                winnerDisplay.setVisibility(View.INVISIBLE);
+                buttonNewRound.setVisibility(View.INVISIBLE);
+
+                dealerTitle.setVisibility(View.VISIBLE);
+                playerTitle.setVisibility(View.VISIBLE);
+                dealerCards.setVisibility(View.VISIBLE);
+                playerCards.setVisibility(View.VISIBLE);
+                buttonHit.setVisibility(View.VISIBLE);
+                buttonStay.setVisibility(View.VISIBLE);
+
+                viewModel.onNewRound();
             }
         });
 
-        // find UI elements
-        dealerCards = findViewById(R.id.dealer_cards_text);
-        playerCards = findViewById(R.id.player_cards_text);
+
+
+
 
         // ViewModel
         viewModel = ViewModelProviders.of(this).get(GameViewModel.class);
@@ -61,6 +108,20 @@ public class MainActivity extends AppCompatActivity {
             public void onChanged(List<String> strings) {
                 Log.i(LOG_TAG, "User hand display has changed, updating view...");
                 showCards(strings, playerCards);
+            }
+        });
+
+        viewModel.getWinner().observe(this, new Observer<String>() {
+
+            @Override
+            public void onChanged(@Nullable String s) {
+                Log.i(LOG_TAG, "Somebody won! Updating view...");
+                showWinnerDisplay(s, winnerDisplay);
+                winnerDisplay.setVisibility(View.VISIBLE);
+                buttonNewRound.setVisibility(View.VISIBLE);
+
+                buttonHit.setVisibility(View.INVISIBLE);
+                buttonStay.setVisibility(View.INVISIBLE);
             }
         });
     }
@@ -99,6 +160,11 @@ public class MainActivity extends AppCompatActivity {
         view.setText(cardsString.toString());
     }
 
+
+    public void showWinnerDisplay(String winner, TextView view){
+        String display = winner + " WINS!";
+        view.setText(display);
+    }
 
 
 }
