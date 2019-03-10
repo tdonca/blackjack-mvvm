@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView dealerCards;
     private TextView playerCards;
     private TextView winnerDisplay;
+    private TextView userMoney;
     private Button buttonHit;
     private Button buttonStay;
     private Button buttonNewRound;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         dealerCards = findViewById(R.id.dealer_cards_text);
         playerCards = findViewById(R.id.player_cards_text);
         winnerDisplay = findViewById(R.id.winner_display_text);
+        userMoney = findViewById(R.id.user_money_text);
         buttonHit = findViewById(R.id.button_hit);
         buttonStay = findViewById(R.id.button_stay);
         buttonNewRound = findViewById(R.id.button_new_round);
@@ -124,6 +127,23 @@ public class MainActivity extends AppCompatActivity {
                 buttonStay.setVisibility(View.INVISIBLE);
             }
         });
+
+        viewModel.getUserMoney().observe(this, new Observer<Integer>(){
+
+            @Override
+            public void onChanged(@Nullable Integer integer) {
+                Log.i(LOG_TAG, "Money amount changed. Updating view...");
+                showUserMoney(integer, userMoney);
+            }
+        });
+
+        viewModel.getRoundDenied().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(@Nullable String s) {
+                //TODO: display snackbar
+                Snackbar.make(buttonNewRound, s, Snackbar.LENGTH_LONG).show();
+            }
+        });
     }
 
     @Override
@@ -166,5 +186,10 @@ public class MainActivity extends AppCompatActivity {
         view.setText(display);
     }
 
+
+    public void showUserMoney(Integer money, TextView view){
+        String display = "Money: $" + money;
+        view.setText(display);
+    }
 
 }

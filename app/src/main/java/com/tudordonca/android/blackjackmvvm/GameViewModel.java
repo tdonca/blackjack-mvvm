@@ -12,6 +12,8 @@ public class GameViewModel extends ViewModel {
     private LiveData<List<String>> dealerHand;
     private LiveData<List<String>> playerHand;
     private LiveData<String> winner;
+    private LiveData<Integer> userMoney;
+    private LiveData<String> roundDenied;
 
     public GameViewModel(){
         gameRepository = new GameRepository();
@@ -29,6 +31,12 @@ public class GameViewModel extends ViewModel {
         if(winner == null){
             winner = gameRepository.getWinner();
         }
+        if(userMoney == null){
+            userMoney = gameRepository.getUserMoney();
+        }
+        if(roundDenied == null){
+            roundDenied = gameRepository.getRoundDenied();
+        }
     }
 
 
@@ -44,6 +52,14 @@ public class GameViewModel extends ViewModel {
         return winner;
     }
 
+    public LiveData<Integer> getUserMoney(){
+        return userMoney;
+    }
+
+    public LiveData<String> getRoundDenied(){
+        return roundDenied;
+    }
+
     public void onUserHit(){
         gameRepository.userHit();
     }
@@ -53,6 +69,7 @@ public class GameViewModel extends ViewModel {
     }
 
     public void onNewRound(){
+
         gameRepository.newRound();
     }
 }

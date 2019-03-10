@@ -9,4 +9,5 @@
     <string name="button_stay_text">STAY</string>
     <string name="button_new_round_text">NEW ROUND</string>
     <string name="winner_display_text">NO WINNER</string>
+    <string name="user_money_text">Money: $0</string>
 </resources>
