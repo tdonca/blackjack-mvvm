@@ -61,15 +61,15 @@ public class GameViewModel extends ViewModel {
     }
 
     public void onUserHit(){
-        gameRepository.userHit();
+        gameRepository.inputUserHit();
     }
 
     public void onUserStay(){
-        gameRepository.userStay();
+        gameRepository.inputUserStay();
     }
 
     public void onNewRound(){
 
-        gameRepository.newRound();
+        gameRepository.inputNewRound();
     }
 }
