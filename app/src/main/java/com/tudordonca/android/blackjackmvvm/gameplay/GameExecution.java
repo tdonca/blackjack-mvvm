@@ -8,6 +8,9 @@ import com.tudordonca.android.blackjackmvvm.GameEvent;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.subjects.BehaviorSubject;
+
 public class GameExecution {
     private final String LOG_TAG = "GameExecution";
     private StandardRuleSet ruleSet;
@@ -22,16 +25,16 @@ public class GameExecution {
     private MutableLiveData<String> winnerDisplay;
 
 
-    private MutableLiveData<GameEvent<Object>> roundStarted;
-    private MutableLiveData<GameEvent<List<Card>>> userCardsChanged;
-    private MutableLiveData<GameEvent<List<Card>>> dealerCardsChanged;
-    private MutableLiveData<GameEvent<Card>> userHit;
-    private MutableLiveData<GameEvent<Object>> userStay;
-    private MutableLiveData<GameEvent<Card>> dealerHit;
-    private MutableLiveData<GameEvent<Object>> dealerStay;
-    private MutableLiveData<GameEvent<Object>> roundFinished;
-    private MutableLiveData<GameEvent<String>> userWins;
-    private MutableLiveData<GameEvent<String>> dealerWins;
+    private BehaviorSubject<GameEvent<Object>> roundStarted;
+    private BehaviorSubject<GameEvent<List<Card>>> userCardsChanged;
+    private BehaviorSubject<GameEvent<List<Card>>> dealerCardsChanged;
+    private BehaviorSubject<GameEvent<Card>> userHit;
+    private BehaviorSubject<GameEvent<Object>> userStay;
+    private BehaviorSubject<GameEvent<Card>> dealerHit;
+    private BehaviorSubject<GameEvent<Object>> dealerStay;
+    private BehaviorSubject<GameEvent<Object>> roundFinished;
+    private BehaviorSubject<GameEvent<String>> userWins;
+    private BehaviorSubject<GameEvent<String>> dealerWins;
 
 
 
@@ -49,21 +52,21 @@ public class GameExecution {
         winnerDisplay = new MutableLiveData<>();
         ruleSet = new StandardRuleSet();
 
-        roundStarted = new MutableLiveData<>();
-        userCardsChanged = new MutableLiveData<>();
-        dealerCardsChanged = new MutableLiveData<>();
-        userHit = new MutableLiveData<>();
-        userStay = new MutableLiveData<>();
-        dealerHit = new MutableLiveData<>();
-        dealerStay = new MutableLiveData<>();
-        roundFinished = new MutableLiveData<>();
-        userWins = new MutableLiveData<>();
-        dealerWins = new MutableLiveData<>();
+        roundStarted = BehaviorSubject.create();
+        userCardsChanged = BehaviorSubject.create();
+        dealerCardsChanged = BehaviorSubject.create();
+        userHit = BehaviorSubject.create();
+        userStay = BehaviorSubject.create();
+        dealerHit = BehaviorSubject.create();
+        dealerStay = BehaviorSubject.create();
+        roundFinished = BehaviorSubject.create();
+        userWins = BehaviorSubject.create();
+        dealerWins = BehaviorSubject.create();
 
     }
 
     public void startRound(){
-        roundStarted.setValue(new GameEvent<Object>(new Object()));
+        roundStarted.onNext(new GameEvent<Object>(new Object()));
         dealer.clearCards();
         dealerHandValue = 0;
         user.clearCards();
@@ -95,8 +98,8 @@ public class GameExecution {
         dealerHandDisplay.setValue(dealer.getCardsDisplay());
         userHandDisplay.setValue(user.getCardsDisplay());
         //Todo: with
-        userCardsChanged.setValue(new GameEvent<>(user.getCards()));
-        dealerCardsChanged.setValue(new GameEvent<>(dealer.getCards()));
+        userCardsChanged.onNext(new GameEvent<>(user.getCards()));
+        dealerCardsChanged.onNext(new GameEvent<>(dealer.getCards()));
         evaluateCards();
     }
 
@@ -114,26 +117,26 @@ public class GameExecution {
             Log.i(LOG_TAG, "DEALER WINS!");
             winnerDisplay.setValue("DEALER");
             //TODO: replace with
-            dealerWins.setValue(new GameEvent<String>("USER BUST"));
+            dealerWins.onNext(new GameEvent<String>("USER BUST"));
 
         }
         else if(dealerHandValue > 21){
             Log.i(LOG_TAG, "USER WINS!");
             winnerDisplay.setValue("USER");
             //TODO: replace with
-            userWins.setValue(new GameEvent<String>("DEALER BUST"));
+            userWins.onNext(new GameEvent<String>("DEALER BUST"));
         }
         else if(dealerHandValue >= userHandValue){
             Log.i(LOG_TAG, "DEALER WINS!");
             winnerDisplay.setValue("DEALER");
             //TODO: replace with
-            dealerWins.setValue(new GameEvent<String>("GREATER VALUE"));
+            dealerWins.onNext(new GameEvent<String>("GREATER VALUE"));
         }
         else{
             Log.i(LOG_TAG, "USER WINS!");
             winnerDisplay.setValue("USER");
             //TODO: replace with
-            userWins.setValue(new GameEvent<String>("GREATER VALUE"));
+            userWins.onNext(new GameEvent<String>("GREATER VALUE"));
         }
     }
 
@@ -142,11 +145,11 @@ public class GameExecution {
         if(userTurn){
             Log.i(LOG_TAG, "User hits, getting a new card...");
             Card card = deck.drawCard();
-            userHit.setValue(new GameEvent<Card>(card));
+            userHit.onNext(new GameEvent<Card>(card));
             user.addCard(card);
             userHandDisplay.setValue(user.getCardsDisplay());
             //TODO: replace with
-            userCardsChanged.setValue(new GameEvent<List<Card>>(user.getCards()));
+            userCardsChanged.onNext(new GameEvent<List<Card>>(user.getCards()));
             Log.i(LOG_TAG, "User has " + user.getCards().size() + " cards: " + user.getCards().toString());
             evaluateCards();
 
@@ -166,7 +169,7 @@ public class GameExecution {
     public void userStay(){
         if(userTurn){
             Log.i(LOG_TAG, "User stays, moving to dealer's turn...");
-            userStay.setValue(new GameEvent<Object>(new Object()));
+            userStay.onNext(new GameEvent<Object>(new Object()));
             userTurn = false;
             dealerTurn();
         }
@@ -182,11 +185,11 @@ public class GameExecution {
         while(dealerHandValue < 17){
             Log.i(LOG_TAG, "Dealer hits, getting a new card...");
             Card card = deck.drawCard();
-            dealerHit.setValue(new GameEvent<Card>(card));
+            dealerHit.onNext(new GameEvent<Card>(card));
             dealer.addCard(card);
             dealerHandDisplay.setValue(dealer.getCardsDisplay());
             //TODO: replace with
-            dealerCardsChanged.setValue(new GameEvent<List<Card>>(dealer.getCards()));
+            dealerCardsChanged.onNext(new GameEvent<List<Card>>(dealer.getCards()));
             Log.i(LOG_TAG, "Dealer has " + dealer.getCards().size() + " cards: " + dealer.getCards().toString());
             evaluateCards();
         }
@@ -213,44 +216,44 @@ public class GameExecution {
         return winnerDisplay;
     }
 
-    public LiveData<GameEvent<Object>> getRoundStarted(){
+    public Observable<GameEvent<Object>> getRoundStarted(){
         return roundStarted;
     }
 
-    public LiveData<GameEvent<List<Card>>> getUserCardsChanged(){
+    public Observable<GameEvent<List<Card>>> getUserCardsChanged(){
         return userCardsChanged;
     }
 
-    public LiveData<GameEvent<List<Card>>> getDealerCardsChanged(){
+    public Observable<GameEvent<List<Card>>> getDealerCardsChanged(){
         return dealerCardsChanged;
     }
 
-    public LiveData<GameEvent<Card>> getUserHit(){
+    public Observable<GameEvent<Card>> getUserHit(){
         return userHit;
     }
 
 
-    public LiveData<GameEvent<Object>> getUserStay(){
+    public Observable<GameEvent<Object>> getUserStay(){
         return userStay;
     }
 
-    public LiveData<GameEvent<Card>> getDealerHit(){
+    public Observable<GameEvent<Card>> getDealerHit(){
         return dealerHit;
     }
 
-    public LiveData<GameEvent<Object>> getDealerStay(){
+    public Observable<GameEvent<Object>> getDealerStay(){
         return dealerStay;
     }
 
-    public LiveData<GameEvent<Object>> getRoundFinished(){
+    public Observable<GameEvent<Object>> getRoundFinished(){
         return roundFinished;
     }
 
-    public LiveData<GameEvent<String>> getUserWins(){
+    public Observable<GameEvent<String>> getUserWins(){
         return userWins;
     }
 
-    public LiveData<GameEvent<String>> getDealerWins(){
+    public Observable<GameEvent<String>> getDealerWins(){
         return dealerWins;
     }
 }

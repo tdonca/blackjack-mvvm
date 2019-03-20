@@ -10,6 +10,11 @@ import com.tudordonca.android.blackjackmvvm.gameplay.GameExecution;
 
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.BehaviorSubject;
+
 public class GameRepository {
     private final String LOG_TAG = "GameRepository";
     private final int MIN_BET = 25;
@@ -23,39 +28,42 @@ public class GameRepository {
     //TODO: wrap LiveData objects in EVENT wrapper class for consistency
 
     // Events from Game Execution
-    private LiveData<GameEvent<Object>> roundStarted;
-    private LiveData<GameEvent<List<Card>>> userCardsChanged;
-    private LiveData<GameEvent<List<Card>>> dealerCardsChanged;
-    private LiveData<GameEvent<Card>> userHit;
-    private LiveData<GameEvent<Object>> userStay;
-    private LiveData<GameEvent<Card>> dealerHit;
-    private LiveData<GameEvent<Object>> dealerStay;
-    private LiveData<GameEvent<Object>> roundFinished;
-    private LiveData<GameEvent<String>> userWins;
-    private LiveData<GameEvent<String>> dealerWins;
+    private Observable<GameEvent<Object>> roundStarted;
+    private Observable<GameEvent<List<Card>>> userCardsChanged;
+    private Observable<GameEvent<List<Card>>> dealerCardsChanged;
+    private Observable<GameEvent<Card>> userHit;
+    private Observable<GameEvent<Object>> userStay;
+    private Observable<GameEvent<Card>> dealerHit;
+    private Observable<GameEvent<Object>> dealerStay;
+    private Observable<GameEvent<Object>> roundFinished;
+    private Observable<GameEvent<String>> userWins;
+    private Observable<GameEvent<String>> dealerWins;
 
     // Events for UI updates
-    private MutableLiveData<UIEvent<Object>> roundStartedUI;
-    private MutableLiveData<UIEvent<List<String>>> userCardsUI;
-    private MutableLiveData<UIEvent<List<String>>> dealerCardsUI;
-    private MutableLiveData<UIEvent<String>> userWinsUI;
-    private MutableLiveData<UIEvent<String>> dealerWinsUI;
-    private MutableLiveData<UIEvent<Integer>> userMoneyUI;
-    private MutableLiveData<UIEvent<Object>> roundFinishedUI;
-    private MutableLiveData<UIEvent<String>> roundDeniedUI;
+    private BehaviorSubject<UIEvent<Object>> roundStartedUI;
+    private BehaviorSubject<UIEvent<List<String>>> userCardsUI;
+    private BehaviorSubject<UIEvent<List<String>>> dealerCardsUI;
+    private BehaviorSubject<UIEvent<String>> userWinsUI;
+    private BehaviorSubject<UIEvent<String>> dealerWinsUI;
+    private BehaviorSubject<UIEvent<Integer>> userMoneyUI;
+    private BehaviorSubject<UIEvent<Object>> roundFinishedUI;
+    private BehaviorSubject<UIEvent<String>> roundDeniedUI;
+
 
 
     public GameRepository(){
         game = new GameExecution();
 
-        roundStartedUI = new MutableLiveData<>();
-        userCardsUI = new MutableLiveData<>();
-        dealerCardsUI = new MutableLiveData<>();
-        userWinsUI = new MutableLiveData<>();
-        dealerWinsUI = new MutableLiveData<>();
-        userMoneyUI = new MutableLiveData<>();
-        roundFinishedUI = new MutableLiveData<>();
-        roundDeniedUI = new MutableLiveData<>();
+        roundStartedUI = BehaviorSubject.create();
+        userCardsUI = BehaviorSubject.create();
+        dealerCardsUI = BehaviorSubject.create();
+        userWinsUI = BehaviorSubject.create();
+        dealerWinsUI = BehaviorSubject.create();
+        userMoneyUI = BehaviorSubject.create();
+        roundFinishedUI = BehaviorSubject.create();
+        roundDeniedUI = BehaviorSubject.create();
+
+        setupGameExecutionObservers();
     }
 
     public void init(){
@@ -74,8 +82,6 @@ public class GameRepository {
         if(winner == null){
             winner = game.getWinnerDisplay();
         }
-
-        //TODO: with
         if (roundStarted == null) {
             roundStarted = game.getRoundStarted();
         }
@@ -107,7 +113,7 @@ public class GameRepository {
             dealerWins = game.getDealerWins();
         }
 
-
+        // TODO: with
 
     }
 
@@ -126,14 +132,14 @@ public class GameRepository {
             Log.i(LOG_TAG, "User has enough money, starting round...");
             userMoneyAmount -= MIN_BET;
             userMoney.setValue(userMoneyAmount);
-            roundStartedUI.setValue(new UIEvent<Object>(new Object()));
-            userMoneyUI.setValue(new UIEvent<Integer>(userMoneyAmount));
+            roundStartedUI.onNext(new UIEvent<Object>(new Object()));
+            userMoneyUI.onNext(new UIEvent<Integer>(userMoneyAmount));
             game.startRound();
         }
         else{
             Log.i(LOG_TAG, "User doesn't have enough money, can't play.");
             roundDenied.setValue("User does not have enough money to play.");
-            roundDeniedUI.setValue(new UIEvent<String>("NOT ENOUGH MONEY"));
+            roundDeniedUI.onNext(new UIEvent<String>("NOT ENOUGH MONEY"));
         }
 
     }
@@ -165,14 +171,60 @@ public class GameRepository {
 
     //TODO: with
 
-    public LiveData<UIEvent<Object>> getRoundStartedUI(){ return roundStartedUI; }
-    public LiveData<UIEvent<List<String>>> getUserCardsUI(){ return userCardsUI; }
-    public LiveData<UIEvent<List<String>>> getDealerCardsUI(){ return dealerCardsUI; }
-    public LiveData<UIEvent<String>> getUserWinsUI(){ return userWinsUI; }
-    public LiveData<UIEvent<String>> getDealerWinsUI(){ return dealerWinsUI; }
-    public LiveData<UIEvent<Integer>> getUserMoneyUI(){ return userMoneyUI; }
-    public LiveData<UIEvent<Object>> getRoundFinishedUI(){ return roundFinishedUI; }
-    public LiveData<UIEvent<String>> getRoundDeniedUI(){ return roundDeniedUI; }
+    public Observable<UIEvent<Object>> getRoundStartedUI(){ return roundStartedUI; }
+    public Observable<UIEvent<List<String>>> getUserCardsUI(){ return userCardsUI; }
+    public Observable<UIEvent<List<String>>> getDealerCardsUI(){ return dealerCardsUI; }
+    public Observable<UIEvent<String>> getUserWinsUI(){ return userWinsUI; }
+    public Observable<UIEvent<String>> getDealerWinsUI(){ return dealerWinsUI; }
+    public Observable<UIEvent<Integer>> getUserMoneyUI(){ return userMoneyUI; }
+    public Observable<UIEvent<Object>> getRoundFinishedUI(){ return roundFinishedUI; }
+    public Observable<UIEvent<String>> getRoundDeniedUI(){ return roundDeniedUI; }
 
 
+    private void setupGameExecutionObservers(){
+
+        //TODO: create RxJava observers for these
+        game.getRoundStarted().subscribe(new Observer<GameEvent<Object>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(GameEvent<Object> objectGameEvent) {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+        game.getRoundFinished();
+
+        game.getUserCardsChanged();
+
+        game.getDealerCardsChanged();
+
+        game.getUserHit();
+
+        game.getUserStay();
+
+        game.getDealerHit();
+
+        game.getDealerStay();
+
+        game.getRoundFinished();
+
+        game.getUserWins();
+
+        game.getDealerWins();
+
+    }
 }
