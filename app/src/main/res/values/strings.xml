@@ -10,4 +10,5 @@
     <string name="button_new_round_text">NEW ROUND</string>
     <string name="winner_display_text">NO WINNER</string>
     <string name="user_money_text">Money: $0</string>
+    <string name="winner_reason_display_text">No reason</string>
 </resources>

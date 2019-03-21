@@ -8,6 +8,7 @@ import android.util.Log;
 import com.tudordonca.android.blackjackmvvm.gameplay.Card;
 import com.tudordonca.android.blackjackmvvm.gameplay.GameExecution;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -27,17 +28,17 @@ public class GameRepository {
     private MutableLiveData<String> roundDenied;
     //TODO: wrap LiveData objects in EVENT wrapper class for consistency
 
-    // Events from Game Execution
-    private Observable<GameEvent<Object>> roundStarted;
-    private Observable<GameEvent<List<Card>>> userCardsChanged;
-    private Observable<GameEvent<List<Card>>> dealerCardsChanged;
-    private Observable<GameEvent<Card>> userHit;
-    private Observable<GameEvent<Object>> userStay;
-    private Observable<GameEvent<Card>> dealerHit;
-    private Observable<GameEvent<Object>> dealerStay;
-    private Observable<GameEvent<Object>> roundFinished;
-    private Observable<GameEvent<String>> userWins;
-    private Observable<GameEvent<String>> dealerWins;
+//    // Events from Game Execution
+//    private Observable<GameEvent<Object>> roundStarted;
+//    private Observable<GameEvent<List<Card>>> userCardsChanged;
+//    private Observable<GameEvent<List<Card>>> dealerCardsChanged;
+//    private Observable<GameEvent<Card>> userHit;
+//    private Observable<GameEvent<Object>> userStay;
+//    private Observable<GameEvent<Card>> dealerHit;
+//    private Observable<GameEvent<Object>> dealerStay;
+//    private Observable<GameEvent<Object>> roundFinished;
+//    private Observable<GameEvent<String>> userWins;
+//    private Observable<GameEvent<String>> dealerWins;
 
     // Events for UI updates
     private MutableLiveData<UIEvent<Object>> roundStartedUI;
@@ -174,11 +175,81 @@ public class GameRepository {
             }
         });
 
-        game.getRoundFinished();
+        game.getRoundFinished().subscribe(new Observer<GameEvent<Object>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
 
-        game.getUserCardsChanged();
+            }
 
-        game.getDealerCardsChanged();
+            @Override
+            public void onNext(GameEvent<Object> objectGameEvent) {
+                roundFinishedUI.setValue(new UIEvent<Object>(new Object()));
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+        game.getUserCardsChanged().subscribe(new Observer<GameEvent<List<Card>>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(GameEvent<List<Card>> listGameEvent) {
+                List<Card> cards = listGameEvent.getContentIfNotHandled();
+                List<String> cardsDisplay = new ArrayList<>();
+                for(Card c : cards){
+                    cardsDisplay.add(c.getName());
+                }
+                userCardsUI.setValue(new UIEvent<>(cardsDisplay));
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+        game.getDealerCardsChanged().subscribe(new Observer<GameEvent<List<Card>>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(GameEvent<List<Card>> listGameEvent) {
+                List<Card> cards = listGameEvent.getContentIfNotHandled();
+                List<String> cardsDisplay = new ArrayList<>();
+                for(Card c : cards){
+                    cardsDisplay.add(c.getName());
+                }
+                dealerCardsUI.setValue(new UIEvent<>(cardsDisplay));
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
 
         game.getUserHit();
 
@@ -188,11 +259,71 @@ public class GameRepository {
 
         game.getDealerStay();
 
-        game.getRoundFinished();
+        game.getRoundFinished().subscribe(new Observer<GameEvent<Object>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
 
-        game.getUserWins();
+            }
 
-        game.getDealerWins();
+            @Override
+            public void onNext(GameEvent<Object> objectGameEvent) {
+                roundFinishedUI.setValue(new UIEvent<Object>(new Object()));
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+        game.getUserWins().subscribe(new Observer<GameEvent<String>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(GameEvent<String> stringGameEvent) {
+                userWinsUI.setValue(new UIEvent<>(stringGameEvent.getContentIfNotHandled()));
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
+
+        game.getDealerWins().subscribe(new Observer<GameEvent<String>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(GameEvent<String> stringGameEvent) {
+                dealerWinsUI.setValue(new UIEvent<String>(stringGameEvent.getContentIfNotHandled()));
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onComplete() {
+
+            }
+        });
 
     }
 }

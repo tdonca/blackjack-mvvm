@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView dealerCards;
     private TextView playerCards;
     private TextView winnerDisplay;
+    private TextView winnerReasonDisplay;
     private TextView userMoney;
     private Button buttonHit;
     private Button buttonStay;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         dealerCards = findViewById(R.id.dealer_cards_text);
         playerCards = findViewById(R.id.player_cards_text);
         winnerDisplay = findViewById(R.id.winner_display_text);
+        winnerReasonDisplay = findViewById(R.id.winner_reason_display_text);
         userMoney = findViewById(R.id.user_money_text);
         buttonHit = findViewById(R.id.button_hit);
         buttonStay = findViewById(R.id.button_stay);
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
         dealerCards.setVisibility(View.INVISIBLE);
         playerCards.setVisibility(View.INVISIBLE);
         winnerDisplay.setVisibility(View.INVISIBLE);
+        winnerReasonDisplay.setVisibility(View.INVISIBLE);
         buttonHit.setVisibility(View.INVISIBLE);
         buttonStay.setVisibility(View.INVISIBLE);
 
@@ -62,29 +65,19 @@ public class MainActivity extends AppCompatActivity {
         buttonHit.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                viewModel.onUserHit();
+                viewModel.inputUserHit();
             }
         });
         buttonStay.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                viewModel.onUserStay();
+                viewModel.inputUserStay();
             }
         });
         buttonNewRound.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view) {
-                winnerDisplay.setVisibility(View.INVISIBLE);
-                buttonNewRound.setVisibility(View.INVISIBLE);
-
-                dealerTitle.setVisibility(View.VISIBLE);
-                playerTitle.setVisibility(View.VISIBLE);
-                dealerCards.setVisibility(View.VISIBLE);
-                playerCards.setVisibility(View.VISIBLE);
-                buttonHit.setVisibility(View.VISIBLE);
-                buttonStay.setVisibility(View.VISIBLE);
-
-                viewModel.onNewRound();
+                viewModel.inputNewRound();
             }
         });
 
@@ -129,7 +122,6 @@ public class MainActivity extends AppCompatActivity {
         view.setText(cardsString.toString());
     }
 
-
     public void showWinnerDisplay(String winner, TextView view){
         String display = winner + " WINS!";
         view.setText(display);
@@ -142,7 +134,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    public void showUserCards(List<String> cards){
+
+    }
+
+    public void showDealerCards(List<String> cards){
+
+    }
+
+    public void showWinnerDisplay(String winner, String reason){
+        String display = winner + " WINS!";
+        winnerDisplay.setText(display);
+        winnerReasonDisplay.setText(reason);
+    }
+
+
+    public void showUserMoney(Integer money){
+        String display = "Money: $" + money;
+        //view.setText(display);
+    }
+
+
+
     private void setupUIObservers(){
+
+        //TODO: replace this
 
         // setup dealer hand observer
         viewModel.getDealerHand().observe(this, new Observer<List<String>>() {
@@ -194,10 +210,77 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        //TODO: with this
+
         viewModel.getRoundStartedUI().observe(this, new Observer<UIEvent<Object>>() {
             @Override
             public void onChanged(@Nullable UIEvent<Object> objectUIEvent) {
                 Log.i(LOG_TAG, "Round Started UI Event Received...");
+                winnerDisplay.setVisibility(View.INVISIBLE);
+                winnerReasonDisplay.setVisibility(View.INVISIBLE);
+                buttonNewRound.setVisibility(View.INVISIBLE);
+                dealerTitle.setVisibility(View.VISIBLE);
+                playerTitle.setVisibility(View.VISIBLE);
+                dealerCards.setVisibility(View.VISIBLE);
+                playerCards.setVisibility(View.VISIBLE);
+                buttonHit.setVisibility(View.VISIBLE);
+                buttonStay.setVisibility(View.VISIBLE);
+            }
+        });
+
+        viewModel.getDealerCardsUI().observe(this, new Observer<UIEvent<List<String>>>() {
+            @Override
+            public void onChanged(@Nullable UIEvent<List<String>> listUIEvent) {
+                Log.i(LOG_TAG, "Dealer Cards UI Event Received...");
+
+            }
+        });
+
+        viewModel.getUserCardsUI().observe(this, new Observer<UIEvent<List<String>>>() {
+            @Override
+            public void onChanged(@Nullable UIEvent<List<String>> listUIEvent) {
+                Log.i(LOG_TAG, "User Cards UI Event Received...");
+
+            }
+        });
+
+        viewModel.getRoundFinishedUI().observe(this, new Observer<UIEvent<Object>>() {
+            @Override
+            public void onChanged(@Nullable UIEvent<Object> objectUIEvent) {
+                Log.i(LOG_TAG, "Round Finished UI Event Received...");
+
+            }
+        });
+
+        viewModel.getRoundDeniedUI().observe(this, new Observer<UIEvent<String>>() {
+            @Override
+            public void onChanged(@Nullable UIEvent<String> stringUIEvent) {
+                Log.i(LOG_TAG, "Round Denied UI Event Received...");
+
+            }
+        });
+
+        viewModel.getUserWinsUI().observe(this, new Observer<UIEvent<String>>() {
+            @Override
+            public void onChanged(@Nullable UIEvent<String> stringUIEvent) {
+                Log.i(LOG_TAG, "User Wins UI Event Received...");
+
+            }
+        });
+
+        viewModel.getDealerWinsUI().observe(this, new Observer<UIEvent<String>>() {
+            @Override
+            public void onChanged(@Nullable UIEvent<String> stringUIEvent) {
+                Log.i(LOG_TAG, "Dealer Wins UI Event Received...");
+
+            }
+        });
+
+        viewModel.getUserMoneyUI().observe(this, new Observer<UIEvent<Integer>>() {
+            @Override
+            public void onChanged(@Nullable UIEvent<Integer> integerUIEvent) {
+                Log.i(LOG_TAG, "User Money UI Event Received...");
+
             }
         });
     }

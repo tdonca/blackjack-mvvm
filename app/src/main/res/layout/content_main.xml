@@ -135,5 +135,14 @@
         app:layout_constraintStart_toStartOf="@+id/player_hand_title"
         app:layout_constraintTop_toBottomOf="@+id/player_hand_title" />
 
+    <TextView
+        android:id="@+id/winner_reason_display_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/winner_reason_display_text"
+        app:layout_constraintEnd_toEndOf="@+id/winner_display_text"
+        app:layout_constraintStart_toStartOf="@+id/winner_display_text"
+        app:layout_constraintTop_toBottomOf="@+id/winner_display_text" />
+
 
 </android.support.constraint.ConstraintLayout>
