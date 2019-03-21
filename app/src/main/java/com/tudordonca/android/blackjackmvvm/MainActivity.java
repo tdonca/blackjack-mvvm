@@ -88,13 +88,61 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
         // ViewModel
         viewModel = ViewModelProviders.of(this).get(GameViewModel.class);
         viewModel.init();
+
+        setupUIObservers();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
+
+    public void showCards(List<String> cards, TextView view){
+        StringBuilder cardsString = new StringBuilder();
+        for(String c : cards){
+            cardsString.append(c).append(" ");
+        }
+
+        view.setText(cardsString.toString());
+    }
+
+
+    public void showWinnerDisplay(String winner, TextView view){
+        String display = winner + " WINS!";
+        view.setText(display);
+    }
+
+
+    public void showUserMoney(Integer money, TextView view){
+        String display = "Money: $" + money;
+        view.setText(display);
+    }
+
+
+    private void setupUIObservers(){
 
         // setup dealer hand observer
         viewModel.getDealerHand().observe(this, new Observer<List<String>>() {
@@ -144,52 +192,13 @@ public class MainActivity extends AppCompatActivity {
                 Snackbar.make(buttonNewRound, s, Snackbar.LENGTH_LONG).show();
             }
         });
+
+
+        viewModel.getRoundStartedUI().observe(this, new Observer<UIEvent<Object>>() {
+            @Override
+            public void onChanged(@Nullable UIEvent<Object> objectUIEvent) {
+                Log.i(LOG_TAG, "Round Started UI Event Received...");
+            }
+        });
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-
-
-
-    public void showCards(List<String> cards, TextView view){
-        StringBuilder cardsString = new StringBuilder();
-        for(String c : cards){
-            cardsString.append(c).append(" ");
-        }
-
-        view.setText(cardsString.toString());
-    }
-
-
-    public void showWinnerDisplay(String winner, TextView view){
-        String display = winner + " WINS!";
-        view.setText(display);
-    }
-
-
-    public void showUserMoney(Integer money, TextView view){
-        String display = "Money: $" + money;
-        view.setText(display);
-    }
-
 }

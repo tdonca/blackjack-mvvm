@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModel;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class GameViewModel extends ViewModel {
 
     private GameRepository gameRepository;
@@ -15,6 +16,15 @@ public class GameViewModel extends ViewModel {
     private LiveData<Integer> userMoney;
     private LiveData<String> roundDenied;
 
+    private LiveData<UIEvent<Object>> roundStartedUI;
+    private LiveData<UIEvent<List<String>>> userCardsUI;
+    private LiveData<UIEvent<List<String>>> dealerCardsUI;
+    private LiveData<UIEvent<String>> userWinsUI;
+    private LiveData<UIEvent<String>> dealerWinsUI;
+    private LiveData<UIEvent<Integer>> userMoneyUI;
+    private LiveData<UIEvent<Object>> roundFinishedUI;
+    private LiveData<UIEvent<String>> roundDeniedUI;
+
     public GameViewModel(){
         gameRepository = new GameRepository();
         gameRepository.init();
@@ -22,6 +32,7 @@ public class GameViewModel extends ViewModel {
 
 
     public void init(){
+        //TODO: replace
         if(dealerHand == null){
             dealerHand = gameRepository.getDealerHand();
         }
@@ -37,9 +48,29 @@ public class GameViewModel extends ViewModel {
         if(roundDenied == null){
             roundDenied = gameRepository.getRoundDenied();
         }
+
+        //TODO: with
+        if(roundStartedUI == null){
+            roundStartedUI = gameRepository.getRoundStartedUI();
+        }
+        //TODO:...
     }
 
 
+    public void onUserHit(){
+        gameRepository.inputUserHit();
+    }
+
+    public void onUserStay(){
+        gameRepository.inputUserStay();
+    }
+
+    public void onNewRound(){
+
+        gameRepository.inputNewRound();
+    }
+
+    //TODO: replace this
     public LiveData<List<String>> getDealerHand(){
         return dealerHand;
     }
@@ -60,16 +91,15 @@ public class GameViewModel extends ViewModel {
         return roundDenied;
     }
 
-    public void onUserHit(){
-        gameRepository.inputUserHit();
-    }
+    //TODO: with this
+    public LiveData<UIEvent<Object>> getRoundStartedUI() {return roundStartedUI;}
+    public LiveData<UIEvent<List<String>>> getUserCardsUI () {return userCardsUI;}
+    public LiveData<UIEvent<List<String>>> getDealerCardsUI () {return dealerCardsUI;}
+    public LiveData<UIEvent<String>> getUserWinsUI() {return userWinsUI;}
+    public LiveData<UIEvent<String>> getDealerWinsUI() {return dealerWinsUI;}
+    public LiveData<UIEvent<Integer>> getUserMoneyUI() {return userMoneyUI;}
+    public LiveData<UIEvent<Object>> getRoundFinishedUI() {return roundFinishedUI;}
+    public LiveData<UIEvent<String>> getRoundDeniedUI() {return roundDeniedUI;}
 
-    public void onUserStay(){
-        gameRepository.inputUserStay();
-    }
 
-    public void onNewRound(){
-
-        gameRepository.inputNewRound();
-    }
 }

@@ -40,28 +40,28 @@ public class GameRepository {
     private Observable<GameEvent<String>> dealerWins;
 
     // Events for UI updates
-    private BehaviorSubject<UIEvent<Object>> roundStartedUI;
-    private BehaviorSubject<UIEvent<List<String>>> userCardsUI;
-    private BehaviorSubject<UIEvent<List<String>>> dealerCardsUI;
-    private BehaviorSubject<UIEvent<String>> userWinsUI;
-    private BehaviorSubject<UIEvent<String>> dealerWinsUI;
-    private BehaviorSubject<UIEvent<Integer>> userMoneyUI;
-    private BehaviorSubject<UIEvent<Object>> roundFinishedUI;
-    private BehaviorSubject<UIEvent<String>> roundDeniedUI;
+    private MutableLiveData<UIEvent<Object>> roundStartedUI;
+    private MutableLiveData<UIEvent<List<String>>> userCardsUI;
+    private MutableLiveData<UIEvent<List<String>>> dealerCardsUI;
+    private MutableLiveData<UIEvent<String>> userWinsUI;
+    private MutableLiveData<UIEvent<String>> dealerWinsUI;
+    private MutableLiveData<UIEvent<Integer>> userMoneyUI;
+    private MutableLiveData<UIEvent<Object>> roundFinishedUI;
+    private MutableLiveData<UIEvent<String>> roundDeniedUI;
 
 
 
     public GameRepository(){
         game = new GameExecution();
 
-        roundStartedUI = BehaviorSubject.create();
-        userCardsUI = BehaviorSubject.create();
-        dealerCardsUI = BehaviorSubject.create();
-        userWinsUI = BehaviorSubject.create();
-        dealerWinsUI = BehaviorSubject.create();
-        userMoneyUI = BehaviorSubject.create();
-        roundFinishedUI = BehaviorSubject.create();
-        roundDeniedUI = BehaviorSubject.create();
+        roundStartedUI = new MutableLiveData<>();
+        userCardsUI = new MutableLiveData<>();
+        dealerCardsUI = new MutableLiveData<>();
+        userWinsUI = new MutableLiveData<>();
+        dealerWinsUI = new MutableLiveData<>();
+        userMoneyUI = new MutableLiveData<>();
+        roundFinishedUI = new MutableLiveData<>();
+        roundDeniedUI = new MutableLiveData<>();
 
         setupGameExecutionObservers();
     }
@@ -82,38 +82,7 @@ public class GameRepository {
         if(winner == null){
             winner = game.getWinnerDisplay();
         }
-        if (roundStarted == null) {
-            roundStarted = game.getRoundStarted();
-        }
-        if (userCardsChanged == null) {
-            userCardsChanged = game.getUserCardsChanged();
-        }
-        if (dealerCardsChanged == null) {
-            dealerCardsChanged = game.getDealerCardsChanged();
-        }
-        if (userHit == null) {
-            userHit = game.getUserHit();
-        }
-        if (userStay == null) {
-            userStay = game.getUserStay();
-        }
-        if (dealerHit == null) {
-            dealerHit = game.getDealerHit();
-        }
-        if (dealerStay == null) {
-            dealerStay = game.getDealerStay();
-        }
-        if (roundFinished == null) {
-            roundFinished = game.getRoundFinished();
-        }
-        if (userWins == null) {
-            userWins = game.getUserWins();
-        }
-        if (dealerWins == null) {
-            dealerWins = game.getDealerWins();
-        }
 
-        // TODO: with
 
     }
 
@@ -132,14 +101,13 @@ public class GameRepository {
             Log.i(LOG_TAG, "User has enough money, starting round...");
             userMoneyAmount -= MIN_BET;
             userMoney.setValue(userMoneyAmount);
-            roundStartedUI.onNext(new UIEvent<Object>(new Object()));
-            userMoneyUI.onNext(new UIEvent<Integer>(userMoneyAmount));
+            userMoneyUI.setValue(new UIEvent<Integer>(userMoneyAmount));
             game.startRound();
         }
         else{
             Log.i(LOG_TAG, "User doesn't have enough money, can't play.");
             roundDenied.setValue("User does not have enough money to play.");
-            roundDeniedUI.onNext(new UIEvent<String>("NOT ENOUGH MONEY"));
+            roundDeniedUI.setValue(new UIEvent<String>("NOT ENOUGH MONEY"));
         }
 
     }
@@ -171,14 +139,14 @@ public class GameRepository {
 
     //TODO: with
 
-    public Observable<UIEvent<Object>> getRoundStartedUI(){ return roundStartedUI; }
-    public Observable<UIEvent<List<String>>> getUserCardsUI(){ return userCardsUI; }
-    public Observable<UIEvent<List<String>>> getDealerCardsUI(){ return dealerCardsUI; }
-    public Observable<UIEvent<String>> getUserWinsUI(){ return userWinsUI; }
-    public Observable<UIEvent<String>> getDealerWinsUI(){ return dealerWinsUI; }
-    public Observable<UIEvent<Integer>> getUserMoneyUI(){ return userMoneyUI; }
-    public Observable<UIEvent<Object>> getRoundFinishedUI(){ return roundFinishedUI; }
-    public Observable<UIEvent<String>> getRoundDeniedUI(){ return roundDeniedUI; }
+    public LiveData<UIEvent<Object>> getRoundStartedUI(){ return roundStartedUI; }
+    public LiveData<UIEvent<List<String>>> getUserCardsUI(){ return userCardsUI; }
+    public LiveData<UIEvent<List<String>>> getDealerCardsUI(){ return dealerCardsUI; }
+    public LiveData<UIEvent<String>> getUserWinsUI(){ return userWinsUI; }
+    public LiveData<UIEvent<String>> getDealerWinsUI(){ return dealerWinsUI; }
+    public LiveData<UIEvent<Integer>> getUserMoneyUI(){ return userMoneyUI; }
+    public LiveData<UIEvent<Object>> getRoundFinishedUI(){ return roundFinishedUI; }
+    public LiveData<UIEvent<String>> getRoundDeniedUI(){ return roundDeniedUI; }
 
 
     private void setupGameExecutionObservers(){
@@ -192,7 +160,7 @@ public class GameRepository {
 
             @Override
             public void onNext(GameEvent<Object> objectGameEvent) {
-
+                roundStartedUI.setValue(new UIEvent<Object>(new Object()));
             }
 
             @Override
