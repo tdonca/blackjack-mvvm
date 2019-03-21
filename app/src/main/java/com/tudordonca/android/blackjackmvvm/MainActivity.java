@@ -8,11 +8,13 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import java.util.List;
@@ -86,6 +88,10 @@ public class MainActivity extends AppCompatActivity {
         viewModel.init();
 
         setupUIObservers();
+
+        Toast toast = Toast.makeText(this, "Buyin is $25", Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     @Override
@@ -112,135 +118,76 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    public void showNewRound(){
+        winnerDisplay.setVisibility(View.INVISIBLE);
+        winnerReasonDisplay.setVisibility(View.INVISIBLE);
+        buttonNewRound.setVisibility(View.INVISIBLE);
+        dealerTitle.setVisibility(View.VISIBLE);
+        playerTitle.setVisibility(View.VISIBLE);
+        dealerCards.setVisibility(View.VISIBLE);
+        playerCards.setVisibility(View.VISIBLE);
+        buttonHit.setVisibility(View.VISIBLE);
+        buttonStay.setVisibility(View.VISIBLE);
+    }
 
-    public void showCards(List<String> cards, TextView view){
+    public void showRoundFinished(){
+        buttonHit.setVisibility(View.INVISIBLE);
+        buttonStay.setVisibility(View.INVISIBLE);
+        buttonNewRound.setVisibility(View.VISIBLE);
+    }
+
+    public void showRoundDenied(String reason){
+        Snackbar.make(buttonNewRound, reason, Snackbar.LENGTH_LONG).show();
+    }
+
+    public void showUserCards(List<String> cards){
         StringBuilder cardsString = new StringBuilder();
         for(String c : cards){
             cardsString.append(c).append(" ");
         }
-
-        view.setText(cardsString.toString());
-    }
-
-    public void showWinnerDisplay(String winner, TextView view){
-        String display = winner + " WINS!";
-        view.setText(display);
-    }
-
-
-    public void showUserMoney(Integer money, TextView view){
-        String display = "Money: $" + money;
-        view.setText(display);
-    }
-
-
-    public void showUserCards(List<String> cards){
-
+        playerCards.setText(cardsString.toString());
     }
 
     public void showDealerCards(List<String> cards){
-
+        StringBuilder cardsString = new StringBuilder();
+        for(String c : cards){
+            cardsString.append(c).append(" ");
+        }
+        dealerCards.setText(cardsString.toString());
     }
 
-    public void showWinnerDisplay(String winner, String reason){
-        String display = winner + " WINS!";
+    public void showUserWins(String reason){
+        String display = "USER WINS!";
         winnerDisplay.setText(display);
         winnerReasonDisplay.setText(reason);
+        winnerDisplay.setVisibility(View.VISIBLE);
+        winnerReasonDisplay.setVisibility(View.VISIBLE);
+    }
+
+    public void showDealerWins(String reason){
+        String display = "DEALER WINS!";
+        winnerDisplay.setText(display);
+        winnerReasonDisplay.setText(reason);
+        winnerDisplay.setVisibility(View.VISIBLE);
+        winnerReasonDisplay.setVisibility(View.VISIBLE);
     }
 
 
     public void showUserMoney(Integer money){
         String display = "Money: $" + money;
-        //view.setText(display);
+        userMoney.setText(display);
+
     }
 
 
 
+
     private void setupUIObservers(){
-
-        //TODO: replace this
-
-        // setup dealer hand observer
-        viewModel.getDealerHand().observe(this, new Observer<List<String>>() {
-            @Override
-            public void onChanged(List<String> strings) {
-                Log.i(LOG_TAG, "Dealer hand display has changed, updating view...");
-                showCards(strings, dealerCards);
-            }
-        });
-
-        // setup player hand observer
-        viewModel.getPlayerHand().observe(this, new Observer<List<String>>() {
-            @Override
-            public void onChanged(List<String> strings) {
-                Log.i(LOG_TAG, "User hand display has changed, updating view...");
-                showCards(strings, playerCards);
-            }
-        });
-
-        viewModel.getWinner().observe(this, new Observer<String>() {
-
-            @Override
-            public void onChanged(@Nullable String s) {
-                Log.i(LOG_TAG, "Somebody won! Updating view...");
-                showWinnerDisplay(s, winnerDisplay);
-                winnerDisplay.setVisibility(View.VISIBLE);
-                buttonNewRound.setVisibility(View.VISIBLE);
-
-                buttonHit.setVisibility(View.INVISIBLE);
-                buttonStay.setVisibility(View.INVISIBLE);
-            }
-        });
-
-        viewModel.getUserMoney().observe(this, new Observer<Integer>(){
-
-            @Override
-            public void onChanged(@Nullable Integer integer) {
-                Log.i(LOG_TAG, "Money amount changed. Updating view...");
-                showUserMoney(integer, userMoney);
-            }
-        });
-
-        viewModel.getRoundDenied().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                //TODO: display snackbar
-                Snackbar.make(buttonNewRound, s, Snackbar.LENGTH_LONG).show();
-            }
-        });
-
-
-        //TODO: with this
-
         viewModel.getRoundStartedUI().observe(this, new Observer<UIEvent<Object>>() {
             @Override
             public void onChanged(@Nullable UIEvent<Object> objectUIEvent) {
                 Log.i(LOG_TAG, "Round Started UI Event Received...");
-                winnerDisplay.setVisibility(View.INVISIBLE);
-                winnerReasonDisplay.setVisibility(View.INVISIBLE);
-                buttonNewRound.setVisibility(View.INVISIBLE);
-                dealerTitle.setVisibility(View.VISIBLE);
-                playerTitle.setVisibility(View.VISIBLE);
-                dealerCards.setVisibility(View.VISIBLE);
-                playerCards.setVisibility(View.VISIBLE);
-                buttonHit.setVisibility(View.VISIBLE);
-                buttonStay.setVisibility(View.VISIBLE);
-            }
-        });
-
-        viewModel.getDealerCardsUI().observe(this, new Observer<UIEvent<List<String>>>() {
-            @Override
-            public void onChanged(@Nullable UIEvent<List<String>> listUIEvent) {
-                Log.i(LOG_TAG, "Dealer Cards UI Event Received...");
-
-            }
-        });
-
-        viewModel.getUserCardsUI().observe(this, new Observer<UIEvent<List<String>>>() {
-            @Override
-            public void onChanged(@Nullable UIEvent<List<String>> listUIEvent) {
-                Log.i(LOG_TAG, "User Cards UI Event Received...");
-
+                showNewRound();
             }
         });
 
@@ -248,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable UIEvent<Object> objectUIEvent) {
                 Log.i(LOG_TAG, "Round Finished UI Event Received...");
-
+                showRoundFinished();
             }
         });
 
@@ -256,15 +203,52 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable UIEvent<String> stringUIEvent) {
                 Log.i(LOG_TAG, "Round Denied UI Event Received...");
-
+                if (stringUIEvent != null) {
+                    showRoundDenied(stringUIEvent.getContentIfNotHandled());
+                }
+                else{
+                    Log.e(LOG_TAG, "Invalid Null event object received!");
+                }
             }
         });
+
+        viewModel.getDealerCardsUI().observe(this, new Observer<UIEvent<List<String>>>() {
+            @Override
+            public void onChanged(@Nullable UIEvent<List<String>> listUIEvent) {
+                Log.i(LOG_TAG, "Dealer Cards UI Event Received...");
+                if (listUIEvent != null) {
+                    showDealerCards(listUIEvent.getContentIfNotHandled());
+                }
+                else{
+                    Log.e(LOG_TAG, "Invalid Null event object received!");
+                }
+            }
+        });
+
+        viewModel.getUserCardsUI().observe(this, new Observer<UIEvent<List<String>>>() {
+            @Override
+            public void onChanged(@Nullable UIEvent<List<String>> listUIEvent) {
+                Log.i(LOG_TAG, "User Cards UI Event Received...");
+                if (listUIEvent != null) {
+                    showUserCards(listUIEvent.getContentIfNotHandled());
+                }
+                else{
+                    Log.e(LOG_TAG, "Invalid Null event object received!");
+                }
+            }
+        });
+
 
         viewModel.getUserWinsUI().observe(this, new Observer<UIEvent<String>>() {
             @Override
             public void onChanged(@Nullable UIEvent<String> stringUIEvent) {
                 Log.i(LOG_TAG, "User Wins UI Event Received...");
-
+                if (stringUIEvent != null) {
+                    showUserWins(stringUIEvent.getContentIfNotHandled());
+                }
+                else{
+                    Log.e(LOG_TAG, "Invalid Null event object received!");
+                }
             }
         });
 
@@ -272,7 +256,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable UIEvent<String> stringUIEvent) {
                 Log.i(LOG_TAG, "Dealer Wins UI Event Received...");
-
+                if (stringUIEvent != null) {
+                    showDealerWins(stringUIEvent.getContentIfNotHandled());
+                }
+                else{
+                    Log.e(LOG_TAG, "Invalid Null event object received!");
+                }
             }
         });
 
@@ -280,7 +269,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onChanged(@Nullable UIEvent<Integer> integerUIEvent) {
                 Log.i(LOG_TAG, "User Money UI Event Received...");
-
+                if (integerUIEvent != null) {
+                    showUserMoney(integerUIEvent.getContentIfNotHandled());
+                }
+                else{
+                    Log.e(LOG_TAG, "Invalid Null event object received!");
+                }
             }
         });
     }

@@ -1,7 +1,5 @@
 package com.tudordonca.android.blackjackmvvm.gameplay;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
 import android.util.Log;
 
 import com.tudordonca.android.blackjackmvvm.GameEvent;
@@ -20,9 +18,6 @@ public class GameExecution {
     private int dealerHandValue;
     private int userHandValue;
     private boolean userTurn;
-    private MutableLiveData<List<String>> dealerHandDisplay;
-    private MutableLiveData<List<String>> userHandDisplay;
-    private MutableLiveData<String> winnerDisplay;
 
 
     private BehaviorSubject<GameEvent<Object>> roundStarted;
@@ -46,10 +41,6 @@ public class GameExecution {
         dealerHandValue = 0;
         userHandValue = 0;
         userTurn = false;
-
-        dealerHandDisplay = new MutableLiveData<>();
-        userHandDisplay = new MutableLiveData<>();
-        winnerDisplay = new MutableLiveData<>();
         ruleSet = new StandardRuleSet();
 
         roundStarted = BehaviorSubject.create();
@@ -66,7 +57,7 @@ public class GameExecution {
     }
 
     public void startRound(){
-        roundStarted.onNext(new GameEvent<Object>(new Object()));
+        roundStarted.onNext(new GameEvent<>(new Object()));
         dealer.clearCards();
         dealerHandValue = 0;
         user.clearCards();
@@ -94,10 +85,6 @@ public class GameExecution {
         dealer.addCard(deck.drawCard());
         Log.i(LOG_TAG, "Dealer has " + dealer.getCards().size() + " cards: " + dealer.getCards().toString());
 
-        //Todo: replace
-        dealerHandDisplay.setValue(dealer.getCardsDisplay());
-        userHandDisplay.setValue(user.getCardsDisplay());
-        //Todo: with
         userCardsChanged.onNext(new GameEvent<>(user.getCards()));
         dealerCardsChanged.onNext(new GameEvent<>(dealer.getCards()));
         evaluateCards();
@@ -115,29 +102,23 @@ public class GameExecution {
     private void finishRound(){
         if(userHandValue > 21){
             Log.i(LOG_TAG, "DEALER WINS!");
-            winnerDisplay.setValue("DEALER");
-            //TODO: replace with
-            dealerWins.onNext(new GameEvent<String>("USER BUST"));
+            dealerWins.onNext(new GameEvent<>("USER BUST"));
 
         }
         else if(dealerHandValue > 21){
             Log.i(LOG_TAG, "USER WINS!");
-            winnerDisplay.setValue("USER");
-            //TODO: replace with
-            userWins.onNext(new GameEvent<String>("DEALER BUST"));
+            userWins.onNext(new GameEvent<>("DEALER BUST"));
         }
         else if(dealerHandValue >= userHandValue){
             Log.i(LOG_TAG, "DEALER WINS!");
-            winnerDisplay.setValue("DEALER");
-            //TODO: replace with
-            dealerWins.onNext(new GameEvent<String>("GREATER VALUE"));
+            dealerWins.onNext(new GameEvent<>("GREATER VALUE"));
         }
         else{
             Log.i(LOG_TAG, "USER WINS!");
-            winnerDisplay.setValue("USER");
-            //TODO: replace with
-            userWins.onNext(new GameEvent<String>("GREATER VALUE"));
+            userWins.onNext(new GameEvent<>("GREATER VALUE"));
         }
+
+        roundFinished.onNext(new GameEvent<>(new Object()));
     }
 
 
@@ -145,11 +126,9 @@ public class GameExecution {
         if(userTurn){
             Log.i(LOG_TAG, "User hits, getting a new card...");
             Card card = deck.drawCard();
-            userHit.onNext(new GameEvent<Card>(card));
+            userHit.onNext(new GameEvent<>(card));
             user.addCard(card);
-            userHandDisplay.setValue(user.getCardsDisplay());
-            //TODO: replace with
-            userCardsChanged.onNext(new GameEvent<List<Card>>(user.getCards()));
+            userCardsChanged.onNext(new GameEvent<>(user.getCards()));
             Log.i(LOG_TAG, "User has " + user.getCards().size() + " cards: " + user.getCards().toString());
             evaluateCards();
 
@@ -169,7 +148,7 @@ public class GameExecution {
     public void userStay(){
         if(userTurn){
             Log.i(LOG_TAG, "User stays, moving to dealer's turn...");
-            userStay.onNext(new GameEvent<Object>(new Object()));
+            userStay.onNext(new GameEvent<>(new Object()));
             userTurn = false;
             dealerTurn();
         }
@@ -185,11 +164,9 @@ public class GameExecution {
         while(dealerHandValue < 17){
             Log.i(LOG_TAG, "Dealer hits, getting a new card...");
             Card card = deck.drawCard();
-            dealerHit.onNext(new GameEvent<Card>(card));
+            dealerHit.onNext(new GameEvent<>(card));
             dealer.addCard(card);
-            dealerHandDisplay.setValue(dealer.getCardsDisplay());
-            //TODO: replace with
-            dealerCardsChanged.onNext(new GameEvent<List<Card>>(dealer.getCards()));
+            dealerCardsChanged.onNext(new GameEvent<>(dealer.getCards()));
             Log.i(LOG_TAG, "Dealer has " + dealer.getCards().size() + " cards: " + dealer.getCards().toString());
             evaluateCards();
         }
@@ -202,19 +179,6 @@ public class GameExecution {
     }
 
 
-
-
-    public LiveData<List<String>> getDealerHandDisplay(){
-        return dealerHandDisplay;
-    }
-
-    public LiveData<List<String>> getUserHandDisplay(){
-        return userHandDisplay;
-    }
-
-    public LiveData<String> getWinnerDisplay() {
-        return winnerDisplay;
-    }
 
     public Observable<GameEvent<Object>> getRoundStarted(){
         return roundStarted;

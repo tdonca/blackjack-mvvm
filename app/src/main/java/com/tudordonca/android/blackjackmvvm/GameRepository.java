@@ -11,10 +11,8 @@ import com.tudordonca.android.blackjackmvvm.gameplay.GameExecution;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observable;
 import io.reactivex.Observer;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.subjects.BehaviorSubject;
 
 public class GameRepository {
     private final String LOG_TAG = "GameRepository";
@@ -26,19 +24,6 @@ public class GameRepository {
     private LiveData<String> winner;
     private MutableLiveData<Integer> userMoney;
     private MutableLiveData<String> roundDenied;
-    //TODO: wrap LiveData objects in EVENT wrapper class for consistency
-
-//    // Events from Game Execution
-//    private Observable<GameEvent<Object>> roundStarted;
-//    private Observable<GameEvent<List<Card>>> userCardsChanged;
-//    private Observable<GameEvent<List<Card>>> dealerCardsChanged;
-//    private Observable<GameEvent<Card>> userHit;
-//    private Observable<GameEvent<Object>> userStay;
-//    private Observable<GameEvent<Card>> dealerHit;
-//    private Observable<GameEvent<Object>> dealerStay;
-//    private Observable<GameEvent<Object>> roundFinished;
-//    private Observable<GameEvent<String>> userWins;
-//    private Observable<GameEvent<String>> dealerWins;
 
     // Events for UI updates
     private MutableLiveData<UIEvent<Object>> roundStartedUI;
@@ -70,21 +55,9 @@ public class GameRepository {
     public void init(){
         userMoney = new MutableLiveData<>();
         userMoneyAmount = 100;
+        userMoneyUI.setValue(new UIEvent<>(userMoneyAmount));
         userMoney.setValue(userMoneyAmount);
         roundDenied = new MutableLiveData<>();
-
-        //TODO: replace
-        if(dealerHand == null){
-            dealerHand = game.getDealerHandDisplay();
-        }
-        if(userHand == null){
-            userHand = game.getUserHandDisplay();
-        }
-        if(winner == null){
-            winner = game.getWinnerDisplay();
-        }
-
-
     }
 
 
@@ -102,13 +75,13 @@ public class GameRepository {
             Log.i(LOG_TAG, "User has enough money, starting round...");
             userMoneyAmount -= MIN_BET;
             userMoney.setValue(userMoneyAmount);
-            userMoneyUI.setValue(new UIEvent<Integer>(userMoneyAmount));
+            userMoneyUI.setValue(new UIEvent<>(userMoneyAmount));
             game.startRound();
         }
         else{
             Log.i(LOG_TAG, "User doesn't have enough money, can't play.");
             roundDenied.setValue("User does not have enough money to play.");
-            roundDeniedUI.setValue(new UIEvent<String>("NOT ENOUGH MONEY"));
+            roundDeniedUI.setValue(new UIEvent<>("NOT ENOUGH MONEY"));
         }
 
     }
@@ -161,7 +134,7 @@ public class GameRepository {
 
             @Override
             public void onNext(GameEvent<Object> objectGameEvent) {
-                roundStartedUI.setValue(new UIEvent<Object>(new Object()));
+                roundStartedUI.setValue(new UIEvent<>(new Object()));
             }
 
             @Override
@@ -183,7 +156,7 @@ public class GameRepository {
 
             @Override
             public void onNext(GameEvent<Object> objectGameEvent) {
-                roundFinishedUI.setValue(new UIEvent<Object>(new Object()));
+                roundFinishedUI.setValue(new UIEvent<>(new Object()));
             }
 
             @Override
@@ -259,28 +232,6 @@ public class GameRepository {
 
         game.getDealerStay();
 
-        game.getRoundFinished().subscribe(new Observer<GameEvent<Object>>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-
-            }
-
-            @Override
-            public void onNext(GameEvent<Object> objectGameEvent) {
-                roundFinishedUI.setValue(new UIEvent<Object>(new Object()));
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onComplete() {
-
-            }
-        });
-
         game.getUserWins().subscribe(new Observer<GameEvent<String>>() {
             @Override
             public void onSubscribe(Disposable d) {
@@ -290,6 +241,8 @@ public class GameRepository {
             @Override
             public void onNext(GameEvent<String> stringGameEvent) {
                 userWinsUI.setValue(new UIEvent<>(stringGameEvent.getContentIfNotHandled()));
+                userMoneyAmount += 2*MIN_BET;
+                userMoneyUI.setValue(new UIEvent<>(userMoneyAmount));
             }
 
             @Override
@@ -311,7 +264,7 @@ public class GameRepository {
 
             @Override
             public void onNext(GameEvent<String> stringGameEvent) {
-                dealerWinsUI.setValue(new UIEvent<String>(stringGameEvent.getContentIfNotHandled()));
+                dealerWinsUI.setValue(new UIEvent<>(stringGameEvent.getContentIfNotHandled()));
             }
 
             @Override
