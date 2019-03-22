@@ -1,5 +1,5 @@
 # Overview
-Blackjack Android Application  
+Blackjack Android Application: [Google Play Store Listing](https://play.google.com/store/apps/details?id=com.tudordonca.android.blackjackmvvm) 
   
   
 ### MVVM - LiveData & RxJava  
