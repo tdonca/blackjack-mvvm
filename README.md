@@ -4,7 +4,7 @@ Blackjack Android Application: [Google Play Store Listing](https://play.google.c
   
 ### MVVM - LiveData & RxJava  
 This is a Blackjack application (temporarily text-only) that focuses on Object Oriented Principles for the game mechanics.  
-The user interface follows the MVVM architecture, using LiveData for Aynchronous UI updates in reaction to game events, and the internal game 
+The user interface follows the MVVM architecture, using LiveData for UI updates in reaction to game events, and the internal game 
 mechanics uses RxJava for handling user input events and their effects.
   
     
