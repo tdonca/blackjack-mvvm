@@ -88,31 +88,6 @@ public class GameRepository {
 
 
 
-    // TODO: Replace
-
-    public LiveData<List<String>> getDealerHand(){
-        return dealerHand;
-    }
-
-    public LiveData<List<String>> getPlayerHand(){
-        return userHand;
-    }
-
-    public LiveData<String> getWinner(){
-        return winner;
-    }
-
-    public LiveData<Integer> getUserMoney(){
-        return userMoney;
-    }
-
-    public LiveData<String> getRoundDenied(){
-        return roundDenied;
-    }
-
-
-    //TODO: with
-
     public LiveData<UIEvent<Object>> getRoundStartedUI(){ return roundStartedUI; }
     public LiveData<UIEvent<List<String>>> getUserCardsUI(){ return userCardsUI; }
     public LiveData<UIEvent<List<String>>> getDealerCardsUI(){ return dealerCardsUI; }
