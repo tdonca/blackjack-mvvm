@@ -3,68 +3,40 @@ package com.tudordonca.android.blackjackmvvm;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.ViewModel;
 
+import com.tudordonca.android.blackjackmvvm.gameplay.GameExecution;
+
 import java.util.List;
 
 
 public class GameViewModel extends ViewModel {
 
-    private GameRepository gameRepository;
-    private LiveData<UIEvent<Object>> roundStartedUI;
-    private LiveData<UIEvent<List<String>>> userCardsUI;
-    private LiveData<UIEvent<List<String>>> dealerCardsUI;
-    private LiveData<UIEvent<String>> userWinsUI;
-    private LiveData<UIEvent<String>> dealerWinsUI;
-    private LiveData<UIEvent<Integer>> userMoneyUI;
-    private LiveData<UIEvent<Object>> roundFinishedUI;
-    private LiveData<UIEvent<String>> roundDeniedUI;
+    private GameExecution gameExecution;
+
 
     public GameViewModel(){
-        gameRepository = new GameRepository();
-        gameRepository.init();
+        gameExecution = new GameExecution();
     }
 
 
     public void init(){
-        if(roundStartedUI == null){
-            roundStartedUI = gameRepository.getRoundStartedUI();
-        }
-        if(dealerCardsUI == null){
-            dealerCardsUI = gameRepository.getDealerCardsUI();
-        }
-        if(userCardsUI == null){
-            userCardsUI = gameRepository.getUserCardsUI();
-        }
-        if(userWinsUI == null){
-            userWinsUI = gameRepository.getUserWinsUI();
-        }
-        if(dealerWinsUI == null){
-            dealerWinsUI = gameRepository.getDealerWinsUI();
-        }
-        if(userMoneyUI == null){
-            userMoneyUI = gameRepository.getUserMoneyUI();
-        }
-        if(roundFinishedUI == null){
-            roundFinishedUI = gameRepository.getRoundFinishedUI();
-        }
-        if(roundDeniedUI == null){
-            roundDeniedUI = gameRepository.getRoundDeniedUI();
-        }
 
 
+
+        // create mutablelivedata
 
     }
 
 
     public void inputUserHit(){
-        gameRepository.inputUserHit();
+        GameState state = gameExecution.userHit();
     }
 
     public void inputUserStay(){
-        gameRepository.inputUserStay();
+        GameState state = gameExecution.userStay();
     }
 
     public void inputNewRound(){
-        gameRepository.inputNewRound();
+        GameState state = gameExecution.startRound();
     }
 
 
