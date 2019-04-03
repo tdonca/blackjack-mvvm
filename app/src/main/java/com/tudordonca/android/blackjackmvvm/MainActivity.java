@@ -17,8 +17,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.tudordonca.android.blackjackmvvm.gameplay.GameState;
-
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -136,12 +134,22 @@ public class MainActivity extends AppCompatActivity {
                     showRoundFinished();
                     showDealerWins(uiState.getMessage());
                     showUserMoney(uiState.getUserMoney());
+                    showDealerCards(uiState.getDealerCards());
+                    showUserCards(uiState.getUserCards());
                     break;
                 case USER_WIN:
                     showRoundFinished();
                     showUserWins(uiState.getMessage());
                     showUserMoney(uiState.getUserMoney());
+                    showDealerCards(uiState.getDealerCards());
+                    showUserCards(uiState.getUserCards());
                     break;
+                case TIE:
+                    showRoundFinished();
+                    showTie();
+                    showUserMoney(uiState.getUserMoney());
+                    showDealerCards(uiState.getDealerCards());
+                    showUserCards(uiState.getUserCards());
                 default:
                     break;
             }
@@ -163,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
         buttonNewRound.setVisibility(View.VISIBLE);
         showUserMoney(userMoney);
-        Toast toast = Toast.makeText(this, message + "Buyin is $25.", Toast.LENGTH_LONG);
+        Toast toast = Toast.makeText(this, message + " Buyin is $25.", Toast.LENGTH_LONG);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
@@ -222,6 +230,13 @@ public class MainActivity extends AppCompatActivity {
         winnerReasonDisplay.setVisibility(View.VISIBLE);
     }
 
+    public void showTie(){
+        String display = "TIE";
+        winnerDisplay.setText(display);
+        winnerReasonDisplay.setText("");
+        winnerDisplay.setVisibility(View.VISIBLE);
+        winnerReasonDisplay.setVisibility(View.VISIBLE);
+    }
 
     public void showUserMoney(Integer money){
         String display = "Money: $" + money;

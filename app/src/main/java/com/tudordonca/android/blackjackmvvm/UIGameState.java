@@ -1,13 +1,11 @@
 package com.tudordonca.android.blackjackmvvm;
 
-import com.tudordonca.android.blackjackmvvm.gameplay.GameState;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class UIGameState {
 
-    public enum State {INVALID, WELCOME, DENIED, IN_PROGRESS, DEALER_WIN, USER_WIN};
+    public enum State {INVALID, WELCOME, DENIED, IN_PROGRESS, DEALER_WIN, USER_WIN, TIE};
     private State state;
     private List<String> dealerCards;
     private List<String> userCards;

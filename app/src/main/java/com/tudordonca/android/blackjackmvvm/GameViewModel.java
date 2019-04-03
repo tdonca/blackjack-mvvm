@@ -57,6 +57,10 @@ public class GameViewModel extends ViewModel {
             userMoney += 2*minBet;
             stateUI.setUserMoney(userMoney);
         }
+        else if(stateUI.getState() == UIGameState.State.TIE){
+            userMoney += minBet;
+            stateUI.setUserMoney(userMoney);
+        }
         Log.i(LOG_TAG, "Updating UI State...");
         displayUI.setValue(stateUI);
 
@@ -109,12 +113,21 @@ public class GameViewModel extends ViewModel {
             // UI state
             switch(state.getState()){
                 case ROUND_FINISHED:
-                    if(state.getWinner().equals("DEALER"))
+                    if(state.getWinner().equals("DEALER")) {
                         uiState = new UIGameState(UIGameState.State.DEALER_WIN);
-                    else if(state.getWinner().equals("USER"))
+                        Log.i(LOG_TAG, "Received DEALER_WIN game state");
+                    }
+                    else if(state.getWinner().equals("USER")) {
                         uiState = new UIGameState(UIGameState.State.USER_WIN);
-                    else
+                        Log.i(LOG_TAG, "Received USER_WIN game state");
+                    }
+                    else if(state.getWinner().equals("TIE")){
+                        uiState = new UIGameState(UIGameState.State.TIE);
+                        Log.i(LOG_TAG, "Received TIE game state");
+                    }
+                    else {
                         return new UIGameState(UIGameState.State.INVALID);
+                    }
                     break;
                 default:
                     uiState = new UIGameState(UIGameState.State.IN_PROGRESS);

@@ -36,7 +36,18 @@ public class GameExecution {
         if(userHandValue == 21){
             Log.d(LOG_TAG, "USER BLACKJACK!");
             userTurn = false;
-            return finishRound();
+            GameState state = new GameState(GameState.GameProgressState.ROUND_FINISHED, dealer.getCards(), user.getCards());
+            state.setWinner("USER");
+            state.setMessage("USER BLACKJACK");
+            return state;
+        }
+        else if(dealerHandValue == 21){
+            Log.d(LOG_TAG, "DEALER BLACKJACK!");
+            userTurn = false;
+            GameState state = new GameState(GameState.GameProgressState.ROUND_FINISHED, dealer.getCards(), user.getCards());
+            state.setWinner("DEALER");
+            state.setMessage("DEALER BLACKJACK");
+            return state;
         }
         else{
             userTurn = true;
@@ -139,16 +150,22 @@ public class GameExecution {
             state.setWinner("USER");
             state.setMessage("DEALER BUST");
         }
-        else if(dealerHandValue >= userHandValue){
+        else if(dealerHandValue > userHandValue){
             Log.i(LOG_TAG, "DEALER WINS!");
             state.setWinner("DEALER");
             state.setMessage("GREATER VALUE");
         }
-        else{
+        else if(dealerHandValue < userHandValue){
             Log.i(LOG_TAG, "USER WINS!");
-            state.setWinner("USER WINS");
+            state.setWinner("USER");
             state.setMessage("GREATER VALUE");
         }
+        else{
+            Log.i(LOG_TAG, "Push -- Tie");
+            state.setWinner("TIE");
+            state.setMessage("PUSH");
+        }
+
 
 
         return state;
