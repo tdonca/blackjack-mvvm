@@ -91,9 +91,6 @@ public class MainActivity extends AppCompatActivity {
 
         setupUIObservers();
 
-        Toast toast = Toast.makeText(this, "Buyin is $25", Toast.LENGTH_LONG);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
     }
 
     @Override
@@ -120,29 +117,39 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void processUIStateUpdate(UIGameState uiState){
-        if(uiState.getGameState() == null){
-            showRoundDenied(uiState.getMessage());
-        }
-        else{
-            GameState state = uiState.getGameState();
-            switch(state.getState()){
+        if(uiState != null){
+            switch(uiState.getState()){
                 case WELCOME:
-                    showWelcome();
+                    showWelcome(uiState.getMessage(), uiState.getUserMoney());
                     break;
-                case USER_TURN:
-
+                case DENIED:
+                    showUserMoney(uiState.getUserMoney());
+                    showRoundDenied(uiState.getMessage());
                     break;
-                case ROUND_FINISHED:
-
+                case IN_PROGRESS:
+                    showNewRound();
+                    showUserMoney(uiState.getUserMoney());
+                    showDealerCards(uiState.getDealerCards());
+                    showUserCards(uiState.getUserCards());
                     break;
-                default: break;
-
+                case DEALER_WIN:
+                    showRoundFinished();
+                    showDealerWins(uiState.getMessage());
+                    showUserMoney(uiState.getUserMoney());
+                    break;
+                case USER_WIN:
+                    showRoundFinished();
+                    showUserWins(uiState.getMessage());
+                    showUserMoney(uiState.getUserMoney());
+                    break;
+                default:
+                    break;
             }
         }
     }
 
 
-    public void showWelcome(){
+    public void showWelcome(String message, int userMoney){
         // hide UI elements
         dealerTitle.setVisibility(View.INVISIBLE);
         playerTitle.setVisibility(View.INVISIBLE);
@@ -153,8 +160,12 @@ public class MainActivity extends AppCompatActivity {
         buttonHit.setVisibility(View.INVISIBLE);
         buttonStay.setVisibility(View.INVISIBLE);
 
-        // show round start button
+
         buttonNewRound.setVisibility(View.VISIBLE);
+        showUserMoney(userMoney);
+        Toast toast = Toast.makeText(this, message + "Buyin is $25.", Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     public void showNewRound(){
@@ -222,8 +233,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setupUIObservers(){
-
-
         viewModel.getUIState().observe(this, new Observer<UIGameState>() {
             @Override
             public void onChanged(@Nullable UIGameState uiGameState) {
@@ -232,103 +241,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
-        viewModel.getRoundStartedUI().observe(this, new Observer<UIEvent<Object>>() {
-            @Override
-            public void onChanged(@Nullable UIEvent<Object> objectUIEvent) {
-                Log.i(LOG_TAG, "Round Started UI Event Received...");
-                showNewRound();
-            }
-        });
-
-        viewModel.getRoundFinishedUI().observe(this, new Observer<UIEvent<Object>>() {
-            @Override
-            public void onChanged(@Nullable UIEvent<Object> objectUIEvent) {
-                Log.i(LOG_TAG, "Round Finished UI Event Received...");
-                showRoundFinished();
-            }
-        });
-
-        viewModel.getRoundDeniedUI().observe(this, new Observer<UIEvent<String>>() {
-            @Override
-            public void onChanged(@Nullable UIEvent<String> stringUIEvent) {
-                Log.i(LOG_TAG, "Round Denied UI Event Received...");
-                if (stringUIEvent != null) {
-                    showRoundDenied(stringUIEvent.getContentIfNotHandled());
-                }
-                else{
-                    Log.e(LOG_TAG, "Invalid Null event object received!");
-                }
-            }
-        });
-
-        viewModel.getDealerCardsUI().observe(this, new Observer<UIEvent<List<String>>>() {
-            @Override
-            public void onChanged(@Nullable UIEvent<List<String>> listUIEvent) {
-                Log.i(LOG_TAG, "Dealer Cards UI Event Received...");
-                if (listUIEvent != null) {
-                    showDealerCards(listUIEvent.getContentIfNotHandled());
-                }
-                else{
-                    Log.e(LOG_TAG, "Invalid Null event object received!");
-                }
-            }
-        });
-
-        viewModel.getUserCardsUI().observe(this, new Observer<UIEvent<List<String>>>() {
-            @Override
-            public void onChanged(@Nullable UIEvent<List<String>> listUIEvent) {
-                Log.i(LOG_TAG, "User Cards UI Event Received...");
-                if (listUIEvent != null) {
-                    showUserCards(listUIEvent.getContentIfNotHandled());
-                }
-                else{
-                    Log.e(LOG_TAG, "Invalid Null event object received!");
-                }
-            }
-        });
-
-
-        viewModel.getUserWinsUI().observe(this, new Observer<UIEvent<String>>() {
-            @Override
-            public void onChanged(@Nullable UIEvent<String> stringUIEvent) {
-                Log.i(LOG_TAG, "User Wins UI Event Received...");
-                if (stringUIEvent != null) {
-                    showUserWins(stringUIEvent.getContentIfNotHandled());
-                }
-                else{
-                    Log.e(LOG_TAG, "Invalid Null event object received!");
-                }
-            }
-        });
-
-        viewModel.getDealerWinsUI().observe(this, new Observer<UIEvent<String>>() {
-            @Override
-            public void onChanged(@Nullable UIEvent<String> stringUIEvent) {
-                Log.i(LOG_TAG, "Dealer Wins UI Event Received...");
-                if (stringUIEvent != null) {
-                    showDealerWins(stringUIEvent.getContentIfNotHandled());
-                }
-                else{
-                    Log.e(LOG_TAG, "Invalid Null event object received!");
-                }
-            }
-        });
-
-        viewModel.getUserMoneyUI().observe(this, new Observer<UIEvent<Integer>>() {
-            @Override
-            public void onChanged(@Nullable UIEvent<Integer> integerUIEvent) {
-                Log.i(LOG_TAG, "User Money UI Event Received...");
-                if (integerUIEvent != null) {
-                    showUserMoney(integerUIEvent.getContentIfNotHandled());
-                }
-                else{
-                    Log.e(LOG_TAG, "Invalid Null event object received!");
-                }
-            }
-        });
     }
 }

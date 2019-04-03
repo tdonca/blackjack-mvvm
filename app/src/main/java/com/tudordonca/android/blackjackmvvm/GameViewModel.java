@@ -42,6 +42,10 @@ public class GameViewModel extends ViewModel {
     public void inputUserHit(){
         GameState state = gameExecution.userHit();
         UIGameState stateUI = gameStateToUI(state);
+        if(stateUI.getState() == UIGameState.State.USER_WIN){
+            userMoney += 2*minBet;
+            stateUI.setUserMoney(userMoney);
+        }
         Log.i(LOG_TAG, "Updating UI State...");
         displayUI.setValue(stateUI);
     }
@@ -49,6 +53,10 @@ public class GameViewModel extends ViewModel {
     public void inputUserStay(){
         GameState state = gameExecution.userStay();
         UIGameState stateUI = gameStateToUI(state);
+        if(stateUI.getState() == UIGameState.State.USER_WIN){
+            userMoney += 2*minBet;
+            stateUI.setUserMoney(userMoney);
+        }
         Log.i(LOG_TAG, "Updating UI State...");
         displayUI.setValue(stateUI);
 
@@ -60,6 +68,10 @@ public class GameViewModel extends ViewModel {
             Log.i(LOG_TAG, "User has enough money, starting round...");
             GameState state = gameExecution.startRound();
             UIGameState stateUI = gameStateToUI(state);
+            if(stateUI.getState() == UIGameState.State.USER_WIN){
+                userMoney += 2*minBet;
+                stateUI.setUserMoney(userMoney);
+            }
             Log.i(LOG_TAG, "Updating UI State...");
             displayUI.setValue(stateUI);
 
