@@ -17,6 +17,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import com.tudordonca.android.blackjackmvvm.gameplay.GameState;
+
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -117,6 +119,43 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    private void processUIStateUpdate(UIGameState uiState){
+        if(uiState.getGameState() == null){
+            showRoundDenied(uiState.getMessage());
+        }
+        else{
+            GameState state = uiState.getGameState();
+            switch(state.getState()){
+                case WELCOME:
+                    showWelcome();
+                    break;
+                case USER_TURN:
+
+                    break;
+                case ROUND_FINISHED:
+
+                    break;
+                default: break;
+
+            }
+        }
+    }
+
+
+    public void showWelcome(){
+        // hide UI elements
+        dealerTitle.setVisibility(View.INVISIBLE);
+        playerTitle.setVisibility(View.INVISIBLE);
+        dealerCards.setVisibility(View.INVISIBLE);
+        playerCards.setVisibility(View.INVISIBLE);
+        winnerDisplay.setVisibility(View.INVISIBLE);
+        winnerReasonDisplay.setVisibility(View.INVISIBLE);
+        buttonHit.setVisibility(View.INVISIBLE);
+        buttonStay.setVisibility(View.INVISIBLE);
+
+        // show round start button
+        buttonNewRound.setVisibility(View.VISIBLE);
+    }
 
     public void showNewRound(){
         winnerDisplay.setVisibility(View.INVISIBLE);
@@ -183,6 +222,20 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void setupUIObservers(){
+
+
+        viewModel.getUIState().observe(this, new Observer<UIGameState>() {
+            @Override
+            public void onChanged(@Nullable UIGameState uiGameState) {
+                Log.i(LOG_TAG, "New UI State received...");
+                processUIStateUpdate(uiGameState);
+            }
+        });
+
+
+
+
+
         viewModel.getRoundStartedUI().observe(this, new Observer<UIEvent<Object>>() {
             @Override
             public void onChanged(@Nullable UIEvent<Object> objectUIEvent) {

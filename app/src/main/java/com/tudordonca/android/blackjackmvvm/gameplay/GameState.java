@@ -5,11 +5,11 @@ import java.util.List;
 
 public class GameState {
 
-    public enum GameProgressState {INVALID, WELCOME, USER_TURN, ROUND_FINISHED};
+    public enum GameProgressState {INVALID, USER_TURN, ROUND_FINISHED};
 
     private GameProgressState state;
-    private ArrayList<Card> dealerCards;
-    private ArrayList<Card> userCards;
+    private List<Card> dealerCards;
+    private List<Card> userCards;
     private String winner;
     private String message;
 
@@ -25,18 +25,25 @@ public class GameState {
         this.userCards = new ArrayList<>(userCards);
     }
 
-    GameProgressState getState(){
+    public GameProgressState getState(){
         return state;
     }
 
-    List<Card> getDealerCards(){
+    public List<Card> getDealerCards(){
         return dealerCards;
     }
 
-    List<Card> getUserCards(){
+    public List<Card> getUserCards(){
         return userCards;
     }
 
+    public String getWinner(){
+        return winner;
+    }
+
+    public String getMessage(){
+        return message;
+    }
     void setWinner(String winner){
         this.winner = winner;
     }
