@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case TIE:
                     showRoundFinished();
-                    showTie();
+                    showTie(uiState.getMessage());
                     showUserMoney(uiState.getUserMoney());
                     showDealerCards(uiState.getDealerCards());
                     showUserCards(uiState.getUserCards());
@@ -230,10 +230,10 @@ public class MainActivity extends AppCompatActivity {
         winnerReasonDisplay.setVisibility(View.VISIBLE);
     }
 
-    public void showTie(){
+    public void showTie(String reason){
         String display = "TIE";
         winnerDisplay.setText(display);
-        winnerReasonDisplay.setText("");
+        winnerReasonDisplay.setText(reason);
         winnerDisplay.setVisibility(View.VISIBLE);
         winnerReasonDisplay.setVisibility(View.VISIBLE);
     }

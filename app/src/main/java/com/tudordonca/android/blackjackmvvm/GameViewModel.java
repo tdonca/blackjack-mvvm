@@ -17,8 +17,8 @@ public class GameViewModel extends ViewModel {
 
     private String LOG_TAG = "GameViewModel";
     private GameExecution gameExecution;
-    int userMoney;
-    int minBet;
+    private int userMoney;
+    private int minBet;
     private MutableLiveData<UIGameState> displayUI;
 
 
@@ -28,7 +28,7 @@ public class GameViewModel extends ViewModel {
     }
 
 
-    public void init(){
+    void init(){
         userMoney = getUserMoney();
         displayUI = new MutableLiveData<>();
         UIGameState state = new UIGameState(UIGameState.State.WELCOME);
@@ -39,7 +39,7 @@ public class GameViewModel extends ViewModel {
     }
 
 
-    public void inputUserHit(){
+    void inputUserHit(){
         GameState state = gameExecution.userHit();
         UIGameState stateUI = gameStateToUI(state);
         if(stateUI.getState() == UIGameState.State.USER_WIN){
@@ -50,7 +50,7 @@ public class GameViewModel extends ViewModel {
         displayUI.setValue(stateUI);
     }
 
-    public void inputUserStay(){
+    void inputUserStay(){
         GameState state = gameExecution.userStay();
         UIGameState stateUI = gameStateToUI(state);
         if(stateUI.getState() == UIGameState.State.USER_WIN){
@@ -66,7 +66,7 @@ public class GameViewModel extends ViewModel {
 
     }
 
-    public void inputNewRound(){
+    void inputNewRound(){
         if(userMoney >= minBet){
             userMoney -= minBet;
             Log.i(LOG_TAG, "User has enough money, starting round...");
@@ -92,7 +92,7 @@ public class GameViewModel extends ViewModel {
     }
 
 
-    public int getUserMoney() {
+    private int getUserMoney() {
         return 100;
     }
 
@@ -115,15 +115,12 @@ public class GameViewModel extends ViewModel {
                 case ROUND_FINISHED:
                     if(state.getWinner().equals("DEALER")) {
                         uiState = new UIGameState(UIGameState.State.DEALER_WIN);
-                        Log.i(LOG_TAG, "Received DEALER_WIN game state");
                     }
                     else if(state.getWinner().equals("USER")) {
                         uiState = new UIGameState(UIGameState.State.USER_WIN);
-                        Log.i(LOG_TAG, "Received USER_WIN game state");
                     }
                     else if(state.getWinner().equals("TIE")){
                         uiState = new UIGameState(UIGameState.State.TIE);
-                        Log.i(LOG_TAG, "Received TIE game state");
                     }
                     else {
                         return new UIGameState(UIGameState.State.INVALID);
