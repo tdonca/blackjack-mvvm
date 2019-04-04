@@ -1,13 +1,12 @@
 package com.tudordonca.android.blackjackmvvm.userdata;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
-
+import io.reactivex.Observable;
 
 
 @Dao
@@ -26,7 +25,10 @@ public interface UserDao {
     void deleteUser(User user);
 
     @Query("SELECT * FROM user_table WHERE userID = :id")
-    LiveData<User> getUser(String id);
+    Observable<User> getUser(String id);
+
+    @Query("SELECT * FROM user_table WHERE userID = :id")
+    User getCurrentUserValue(String id);
 
 
 

@@ -6,12 +6,16 @@ import android.util.Log;
 
 import androidx.lifecycle.LiveData;
 import androidx.room.RoomDatabase;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.BehaviorSubject;
 
 public class UserRepository {
     //TODO: remove this hardcoding of a single user
     private final String USERID = "user1";
     private UserDao userDao;
-    private LiveData<User> user;
+    private BehaviorSubject<User> user;
 
     public UserRepository(Application application){
         UserRoomDatabase db = UserRoomDatabase.getDatabase(application);
@@ -21,13 +25,17 @@ public class UserRepository {
         newUser.setUserMoney(100);
         // on conflict will be ignored
         insertUser(newUser);
-        // create LiveData of user
-        user = userDao.getUser(USERID);
+        // create BehaviorSubject of user
+        user = BehaviorSubject.create();
+        userDao.getUser(USERID).subscribe(user);
+        // push initial value into BehaviorSubject for downstream
+        user.onNext(userDao.getCurrentUserValue(USERID));
+
     }
 
     // data access/modification wrapper functions that abstract database access
 
-    public LiveData<User> getUser(){
+    public Observable<User> getUser(){
         return user;
     }
 

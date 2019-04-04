@@ -3,7 +3,10 @@ package com.tudordonca.android.blackjackmvvm;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
+import io.reactivex.Observer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
 
 import android.app.Application;
@@ -24,7 +27,7 @@ public class GameViewModel extends AndroidViewModel {
     private String LOG_TAG = "GameViewModel";
     private GameExecution gameExecution;
     private UserRepository userRepository;
-    private int userMoney;
+    private int userMoney = -1;
     private final int minBet = 25;
     private MutableLiveData<UIGameState> displayUI;
 
@@ -32,7 +35,7 @@ public class GameViewModel extends AndroidViewModel {
         super(application);
         gameExecution = new GameExecution();
         userRepository = new UserRepository(application);
-        setupObservers(application);
+        setupObservers();
         displayUI = new MutableLiveData<>();
         UIGameState state = new UIGameState(UIGameState.State.WELCOME);
         state.setUserMoney(userMoney);
@@ -103,10 +106,32 @@ public class GameViewModel extends AndroidViewModel {
     }
 
 
-    private void setupObservers(Application application){
+    private void setupObservers(){
         // create an RX observer for the user data observable from Room
+        userRepository.getUser().subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<User>() {
+            @Override
+            public void onSubscribe(Disposable d) {
 
+            }
+            @Override
+            public void onNext(User user) {
+                userMoney = user.getUserMoney();
+                Log.i(LOG_TAG, "Received value from User Observable with money: " + user.getUserMoney());
+            }
+            @Override
+            public void onError(Throwable e) {
+
+            }
+            @Override
+            public void onComplete() {
+
+            }
+        });
     }
+
+
 
     private UIGameState gameStateToUI(GameState state){
         if(state == null){

@@ -36,8 +36,6 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonStay;
     private Button buttonNewRound;
 
-    //DEBUG
-    private LiveData<User> userData;
 
 
     @Override
