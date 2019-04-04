@@ -1,6 +1,5 @@
-package com.tudordonca.android.blackjackmvvm.gameplay;
+package com.tudordonca.android.blackjackmvvm.gamemechanics;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface Player {

@@ -13,7 +13,7 @@ import androidx.room.Update;
 @Dao
 public interface UserDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertUser(User user);
 
     @Update
@@ -27,6 +27,8 @@ public interface UserDao {
 
     @Query("SELECT * FROM user_table WHERE userID = :id")
     LiveData<User> getUser(String id);
+
+
 
 
 }

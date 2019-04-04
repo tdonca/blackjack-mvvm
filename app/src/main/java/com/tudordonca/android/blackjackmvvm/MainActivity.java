@@ -1,10 +1,13 @@
 package com.tudordonca.android.blackjackmvvm;
 
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import com.google.android.material.snackbar.Snackbar;
+import com.tudordonca.android.blackjackmvvm.userdata.User;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
@@ -32,6 +35,9 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonHit;
     private Button buttonStay;
     private Button buttonNewRound;
+
+    //DEBUG
+    private LiveData<User> userData;
 
 
     @Override
@@ -85,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
 
         // ViewModel
         viewModel = ViewModelProviders.of(this).get(GameViewModel.class);
-        viewModel.init();
 
         setupUIObservers();
 

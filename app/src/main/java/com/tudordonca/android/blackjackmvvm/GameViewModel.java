@@ -3,14 +3,17 @@ package com.tudordonca.android.blackjackmvvm;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.Observer;
+import io.reactivex.subjects.BehaviorSubject;
 
 import android.app.Application;
 import android.util.Log;
 
-import com.tudordonca.android.blackjackmvvm.gameplay.Card;
-import com.tudordonca.android.blackjackmvvm.gameplay.GameExecution;
-import com.tudordonca.android.blackjackmvvm.gameplay.GameState;
+import com.tudordonca.android.blackjackmvvm.gamemechanics.Card;
+import com.tudordonca.android.blackjackmvvm.gamemechanics.GameExecution;
+import com.tudordonca.android.blackjackmvvm.gamemechanics.GameState;
+import com.tudordonca.android.blackjackmvvm.userdata.User;
+import com.tudordonca.android.blackjackmvvm.userdata.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,20 +23,16 @@ public class GameViewModel extends AndroidViewModel {
 
     private String LOG_TAG = "GameViewModel";
     private GameExecution gameExecution;
+    private UserRepository userRepository;
     private int userMoney;
-    private int minBet;
+    private final int minBet = 25;
     private MutableLiveData<UIGameState> displayUI;
-
 
     public GameViewModel(Application application){
         super(application);
         gameExecution = new GameExecution();
-        minBet = 25;
-    }
-
-
-    void init(){
-        userMoney = getUserMoney();
+        userRepository = new UserRepository(application);
+        setupObservers(application);
         displayUI = new MutableLiveData<>();
         UIGameState state = new UIGameState(UIGameState.State.WELCOME);
         state.setUserMoney(userMoney);
@@ -41,6 +40,7 @@ public class GameViewModel extends AndroidViewModel {
         Log.i(LOG_TAG, "Updating UI State...");
         displayUI.setValue(state);
     }
+
 
 
     void inputUserHit(){
@@ -60,6 +60,7 @@ public class GameViewModel extends AndroidViewModel {
         if(stateUI.getState() == UIGameState.State.USER_WIN){
             userMoney += 2*minBet;
             stateUI.setUserMoney(userMoney);
+
         }
         else if(stateUI.getState() == UIGameState.State.TIE){
             userMoney += minBet;
@@ -96,13 +97,15 @@ public class GameViewModel extends AndroidViewModel {
     }
 
 
-    private int getUserMoney() {
-        return 100;
-    }
-
 
     LiveData<UIGameState> getUIState(){
         return displayUI;
+    }
+
+
+    private void setupObservers(Application application){
+        // create an RX observer for the user data observable from Room
+
     }
 
     private UIGameState gameStateToUI(GameState state){

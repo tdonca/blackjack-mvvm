@@ -1,4 +1,4 @@
-package com.tudordonca.android.blackjackmvvm.gameplay;
+package com.tudordonca.android.blackjackmvvm.gamemechanics;
 
 import android.util.Log;
 

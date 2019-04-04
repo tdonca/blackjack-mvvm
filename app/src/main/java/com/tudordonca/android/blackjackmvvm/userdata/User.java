@@ -15,15 +15,15 @@ public class User {
     @ColumnInfo(name = "money")
     private int userMoney;
 
-    public User(String id){
-        this.userID = id;
+    public User(String userID){
+        this.userID = userID;
     }
 
-    public void setMoney(int money){
+    public void setUserMoney(int money){
         this.userMoney = money;
     }
 
-    public int getMoney(){
+    public int getUserMoney(){
         return this.userMoney;
     }
 
