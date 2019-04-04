@@ -1,8 +1,11 @@
 package com.tudordonca.android.blackjackmvvm;
 
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.ViewModel;
+import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
+import android.app.Application;
 import android.util.Log;
 
 import com.tudordonca.android.blackjackmvvm.gameplay.Card;
@@ -13,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class GameViewModel extends ViewModel {
+public class GameViewModel extends AndroidViewModel {
 
     private String LOG_TAG = "GameViewModel";
     private GameExecution gameExecution;
@@ -22,7 +25,8 @@ public class GameViewModel extends ViewModel {
     private MutableLiveData<UIGameState> displayUI;
 
 
-    public GameViewModel(){
+    public GameViewModel(Application application){
+        super(application);
         gameExecution = new GameExecution();
         minBet = 25;
     }
