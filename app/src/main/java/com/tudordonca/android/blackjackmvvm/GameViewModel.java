@@ -30,13 +30,15 @@ public class GameViewModel extends AndroidViewModel {
     private int userMoney = -1;
     private final int minBet = 25;
     private MutableLiveData<UIGameState> displayUI;
+    private MutableLiveData<Integer> userMoneyUI;
 
     public GameViewModel(Application application){
         super(application);
         gameExecution = new GameExecution();
         userRepository = new UserRepository(application);
-        setupObservers();
         displayUI = new MutableLiveData<>();
+        userMoneyUI = new MutableLiveData<>();
+        setupObservers();
         UIGameState state = new UIGameState(UIGameState.State.WELCOME);
         state.setUserMoney(userMoney);
         state.setMessage("Welcome to Blackjack. Press the button to begin a new round.");
@@ -52,6 +54,7 @@ public class GameViewModel extends AndroidViewModel {
         if(stateUI.getState() == UIGameState.State.USER_WIN){
             userMoney += 2*minBet;
             stateUI.setUserMoney(userMoney);
+            userRepository.updateMoney(userMoney);
         }
         Log.i(LOG_TAG, "Updating UI State...");
         displayUI.setValue(stateUI);
@@ -63,11 +66,13 @@ public class GameViewModel extends AndroidViewModel {
         if(stateUI.getState() == UIGameState.State.USER_WIN){
             userMoney += 2*minBet;
             stateUI.setUserMoney(userMoney);
+            userRepository.updateMoney(userMoney);
 
         }
         else if(stateUI.getState() == UIGameState.State.TIE){
             userMoney += minBet;
             stateUI.setUserMoney(userMoney);
+            userRepository.updateMoney(userMoney);
         }
         Log.i(LOG_TAG, "Updating UI State...");
         displayUI.setValue(stateUI);
@@ -77,12 +82,13 @@ public class GameViewModel extends AndroidViewModel {
     void inputNewRound(){
         if(userMoney >= minBet){
             userMoney -= minBet;
+            userRepository.updateMoney(userMoney);
             Log.i(LOG_TAG, "User has enough money, starting round...");
             GameState state = gameExecution.startRound();
             UIGameState stateUI = gameStateToUI(state);
             if(stateUI.getState() == UIGameState.State.USER_WIN){
                 userMoney += 2*minBet;
-                stateUI.setUserMoney(userMoney);
+                userRepository.updateMoney(userMoney);
             }
             Log.i(LOG_TAG, "Updating UI State...");
             displayUI.setValue(stateUI);
@@ -104,7 +110,7 @@ public class GameViewModel extends AndroidViewModel {
     LiveData<UIGameState> getUIState(){
         return displayUI;
     }
-
+    LiveData<Integer> getUserMoney() {return userMoneyUI;}
 
     private void setupObservers(){
         // create an RX observer for the user data observable from Room
@@ -118,6 +124,7 @@ public class GameViewModel extends AndroidViewModel {
             @Override
             public void onNext(User user) {
                 userMoney = user.getUserMoney();
+                userMoneyUI.setValue(userMoney);
                 Log.i(LOG_TAG, "Received value from User Observable with money: " + user.getUserMoney());
             }
             @Override

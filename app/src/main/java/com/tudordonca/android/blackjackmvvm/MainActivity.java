@@ -259,5 +259,12 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        viewModel.getUserMoney().observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                Log.i(LOG_TAG, "New money value received...");
+                showUserMoney(integer);
+            }
+        });
     }
 }

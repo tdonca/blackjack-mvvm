@@ -21,15 +21,14 @@ public class UserRepository {
         UserRoomDatabase db = UserRoomDatabase.getDatabase(application);
         userDao = db.userDao();
         // create a new user on the first startup
-        User newUser = new User(USERID);
-        newUser.setUserMoney(100);
+        //User newUser = new User(USERID);
+       // newUser.setUserMoney(100);
         // on conflict will be ignored
-        insertUser(newUser);
+        //insertUser(newUser);
         // create BehaviorSubject of user
         user = BehaviorSubject.create();
         userDao.getUser(USERID).subscribe(user);
         // push initial value into BehaviorSubject for downstream
-        user.onNext(userDao.getCurrentUserValue(USERID));
 
     }
 
