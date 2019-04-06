@@ -3,6 +3,13 @@ package com.tudordonca.android.blackjackmvvm;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import com.google.android.material.snackbar.Snackbar;
@@ -10,6 +17,8 @@ import com.tudordonca.android.blackjackmvvm.userdata.User;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -36,7 +45,14 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonStay;
     private Button buttonNewRound;
 
+    private NotificationManager notificationManager;
+    private Intent notifyIntent;
 
+    // Notification ID.
+    private static final int NOTIFICATION_ID = 0;
+    // Notification channel ID.
+    private static final String PRIMARY_CHANNEL_ID =
+            "primary_notification_channel";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,15 +105,49 @@ public class MainActivity extends AppCompatActivity {
 
         // ViewModel
         viewModel = ViewModelProviders.of(this).get(GameViewModel.class);
-
         setupUIObservers();
 
+        ///////////////////////////////////////////////////////////////
+        ///////////////////////////////////////////////////////////////
+        notificationManager = (NotificationManager)
+                getSystemService(NOTIFICATION_SERVICE);
+        //Set up the broadcast receiver and alarm manager
+        notifyIntent = new Intent(this, MoneyAlarmReceiver.class);
+
+        boolean alarmUp = (PendingIntent.getBroadcast(this, NOTIFICATION_ID,
+                notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT) != null);
+        // Only register a new alarm if it doesn't yet exist
+        if(!alarmUp){
+            PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
+                    (this, NOTIFICATION_ID, notifyIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+            AlarmManager alarmManager = (AlarmManager) getSystemService
+                    (ALARM_SERVICE);
+
+            long repeatInterval = AlarmManager.INTERVAL_DAY;
+
+            long triggerTime = SystemClock.elapsedRealtime()
+                    + repeatInterval;
+
+            if (alarmManager != null) {
+                alarmManager.setInexactRepeating
+                        (AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                triggerTime, repeatInterval,
+                                notifyPendingIntent);
+            }
+        }
+
+        // Create the notification channel.
+        createNotificationChannel();
+        //////////////////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////////////////
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
         return true;
     }
 
@@ -110,6 +160,14 @@ public class MainActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
+                    (this, NOTIFICATION_ID, notifyIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT);
+            if (alarmManager != null) {
+                alarmManager.cancel(notifyPendingIntent);
+            }
+            notificationManager.cancelAll();
             return true;
         }
 
@@ -266,5 +324,32 @@ public class MainActivity extends AppCompatActivity {
                 showUserMoney(integer);
             }
         });
+    }
+
+
+    public void createNotificationChannel() {
+
+        // Create a notification manager object.
+        notificationManager =
+                (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        // Notification channels are only available in OREO and higher.
+        // So, add a check on SDK version.
+        if (android.os.Build.VERSION.SDK_INT >=
+                android.os.Build.VERSION_CODES.O) {
+
+            // Create the NotificationChannel with all the parameters.
+            NotificationChannel notificationChannel = new NotificationChannel
+                    (PRIMARY_CHANNEL_ID,
+                            "Stand up notification",
+                            NotificationManager.IMPORTANCE_HIGH);
+
+            notificationChannel.enableLights(true);
+            notificationChannel.setLightColor(Color.RED);
+            notificationChannel.enableVibration(true);
+            notificationChannel.setDescription("Notifies every 15 minutes to " +
+                    "stand up and walk");
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
     }
 }
