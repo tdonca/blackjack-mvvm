@@ -23,6 +23,10 @@ public class User {
         this.userMoney = money;
     }
 
+    public void addUserMoney(int money){
+        this.userMoney += money;
+    }
+
     public int getUserMoney(){
         return this.userMoney;
     }

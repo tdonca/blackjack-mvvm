@@ -56,7 +56,8 @@ public class MoneyAlarmReceiver extends BroadcastReceiver {
 
     private void increaseUserMoney(Context context){
         userRepository = new UserRepository((Application) context.getApplicationContext());
-        userRepository.increaseMoney(101);
+        //TODO: replace with two rxjava operations to get user data and to update the money amount
+        //userRepository.increaseMoney(101);
 
     }
 }

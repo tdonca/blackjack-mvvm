@@ -141,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
         createNotificationChannel();
         //////////////////////////////////////////////////////////////////
         //////////////////////////////////////////////////////////////////
+
     }
 
     @Override
@@ -352,4 +353,10 @@ public class MainActivity extends AppCompatActivity {
             notificationManager.createNotificationChannel(notificationChannel);
         }
     }
+
+    protected void onDestroy() {
+        super.onDestroy();
+        viewModel.disposeObservers();
+    }
+
 }

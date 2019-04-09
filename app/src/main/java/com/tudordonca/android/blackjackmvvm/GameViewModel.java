@@ -5,6 +5,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
@@ -25,12 +26,15 @@ import java.util.List;
 public class GameViewModel extends AndroidViewModel {
 
     private String LOG_TAG = "GameViewModel";
+    private final String USERID = "user1";
+    private final int DEFAULT_MONEY = 100;
     private GameExecution gameExecution;
     private UserRepository userRepository;
-    private int userMoney = -1;
+    private User userData;
     private final int minBet = 25;
     private MutableLiveData<UIGameState> displayUI;
     private MutableLiveData<Integer> userMoneyUI;
+    private final CompositeDisposable disposable = new CompositeDisposable();
 
     public GameViewModel(Application application){
         super(application);
@@ -39,22 +43,23 @@ public class GameViewModel extends AndroidViewModel {
         displayUI = new MutableLiveData<>();
         userMoneyUI = new MutableLiveData<>();
         setupObservers();
+    }
+
+    void displayWelcome(){
         UIGameState state = new UIGameState(UIGameState.State.WELCOME);
-        state.setUserMoney(userMoney);
-        state.setMessage("Welcome to Blackjack. Press the button to begin a new round.");
+        state.setUserMoney(userData.getUserMoney());
+        state.setMessage("Welcome to Blackjack.");
         Log.i(LOG_TAG, "Updating UI State...");
         displayUI.setValue(state);
     }
-
-
 
     void inputUserHit(){
         GameState state = gameExecution.userHit();
         UIGameState stateUI = gameStateToUI(state);
         if(stateUI.getState() == UIGameState.State.USER_WIN){
-            userMoney += 2*minBet;
-            stateUI.setUserMoney(userMoney);
-            userRepository.updateMoney(userMoney);
+            userData.addUserMoney(2*minBet);
+            stateUI.setUserMoney(userData.getUserMoney());
+            userRepository.updateMoney(userData.getUserMoney());
         }
         Log.i(LOG_TAG, "Updating UI State...");
         displayUI.setValue(stateUI);
@@ -64,15 +69,15 @@ public class GameViewModel extends AndroidViewModel {
         GameState state = gameExecution.userStay();
         UIGameState stateUI = gameStateToUI(state);
         if(stateUI.getState() == UIGameState.State.USER_WIN){
-            userMoney += 2*minBet;
-            stateUI.setUserMoney(userMoney);
-            userRepository.updateMoney(userMoney);
+            userData.addUserMoney(2*minBet);
+            stateUI.setUserMoney(userData.getUserMoney());
+            userRepository.updateMoney(userData.getUserMoney());
 
         }
         else if(stateUI.getState() == UIGameState.State.TIE){
-            userMoney += minBet;
-            stateUI.setUserMoney(userMoney);
-            userRepository.updateMoney(userMoney);
+            userData.addUserMoney(minBet);
+            stateUI.setUserMoney(userData.getUserMoney());
+            userRepository.updateMoney(userData.getUserMoney());
         }
         Log.i(LOG_TAG, "Updating UI State...");
         displayUI.setValue(stateUI);
@@ -80,15 +85,16 @@ public class GameViewModel extends AndroidViewModel {
     }
 
     void inputNewRound(){
-        if(userMoney >= minBet){
-            userMoney -= minBet;
-            userRepository.updateMoney(userMoney);
+        if(userData.getUserMoney() >= minBet){
+            userData.addUserMoney(-minBet);
+            userRepository.updateMoney(userData.getUserMoney());
             Log.i(LOG_TAG, "User has enough money, starting round...");
             GameState state = gameExecution.startRound();
             UIGameState stateUI = gameStateToUI(state);
+            // immediate blackjack
             if(stateUI.getState() == UIGameState.State.USER_WIN){
-                userMoney += 2*minBet;
-                userRepository.updateMoney(userMoney);
+                userData.addUserMoney(2*minBet);
+                userRepository.updateMoney(userData.getUserMoney());
             }
             Log.i(LOG_TAG, "Updating UI State...");
             displayUI.setValue(stateUI);
@@ -98,7 +104,7 @@ public class GameViewModel extends AndroidViewModel {
         else{
             Log.i(LOG_TAG, "User doesn't have enough money, can't play.");
             UIGameState stateUI = new UIGameState(UIGameState.State.DENIED);
-            stateUI.setUserMoney(userMoney);
+            stateUI.setUserMoney(userData.getUserMoney());
             stateUI.setMessage("Not enough money to play. Come back tomorrow.");
             Log.i(LOG_TAG, "Updating UI State...");
             displayUI.setValue(stateUI);
@@ -115,31 +121,34 @@ public class GameViewModel extends AndroidViewModel {
 
     private void setupObservers(){
         // create an RX observer for the user data observable from Room
-        userRepository.getUser().subscribeOn(Schedulers.io())
+        disposable.add(userRepository.getUser().subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<User>() {
-            @Override
-            public void onSubscribe(Disposable d) {
+                .subscribe(user -> {
+                    if(user != null){
+                        userData = user;
+                        Log.i(LOG_TAG, "Got Result from Single");
+                        displayWelcome();
+                    }
+                    else{
+                        Log.e(LOG_TAG, "Returned user object is null!");
+                    }
 
-            }
-            @Override
-            public void onNext(User user) {
-                userMoney = user.getUserMoney();
-                userMoneyUI.setValue(userMoney);
-                Log.i(LOG_TAG, "Received value from User Observable with money: " + user.getUserMoney());
-            }
-            @Override
-            public void onError(Throwable e) {
+                }, throwable -> {
+                    Log.e(LOG_TAG, "Failed to retrieve user data from database!");
+                    throwable.printStackTrace();
 
-            }
-            @Override
-            public void onComplete() {
-
-            }
-        });
+                    Log.i(LOG_TAG, "Creating new default user.");
+                    userData = new User(USERID);
+                    userData.setUserMoney(DEFAULT_MONEY);
+                    userRepository.insertUser(userData);
+                    displayWelcome();
+                }));
+        Log.i(LOG_TAG, "Subscribed to getUser() without error");
     }
 
-
+    public void disposeObservers(){
+        disposable.dispose();
+    }
 
     private UIGameState gameStateToUI(GameState state){
         if(state == null){
@@ -171,7 +180,7 @@ public class GameViewModel extends AndroidViewModel {
                     break;
             }
             uiState.setMessage(state.getMessage());
-            uiState.setUserMoney(userMoney);
+            uiState.setUserMoney(userData.getUserMoney());
             // Convert dealer cards to display format
             List<String> cards = new ArrayList<>();
             for(Card c: state.getDealerCards()){
