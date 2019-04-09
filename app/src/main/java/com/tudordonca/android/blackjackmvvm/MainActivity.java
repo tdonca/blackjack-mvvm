@@ -107,8 +107,6 @@ public class MainActivity extends AppCompatActivity {
         viewModel = ViewModelProviders.of(this).get(GameViewModel.class);
         setupUIObservers();
 
-        // Alarm Manager Stuff
-
     }
 
     @Override
@@ -148,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
             if(!alarmUp){
                 PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
                         (MainActivity.this, NOTIFICATION_ID, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-                long repeatInterval = 1000*5;//AlarmManager.INTERVAL_DAY;
+                long repeatInterval = AlarmManager.INTERVAL_DAY;
                 long triggerTime = SystemClock.elapsedRealtime() + repeatInterval;
                 if (alarmManager != null) {
                     alarmManager.setInexactRepeating
@@ -164,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
             // Otherwise turn off the alarm
             else{
                 PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
-                        (MainActivity.this, NOTIFICATION_ID, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        (MainActivity.this, NOTIFICATION_ID, notifyIntent, PendingIntent.FLAG_NO_CREATE);
                 if (alarmManager != null) {
                     alarmManager.cancel(notifyPendingIntent);
                     notificationManager.cancelAll();
@@ -271,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
             cardsString.append(c).append(" ");
         }
         playerCards.setText(cardsString.toString());
+        playerCards.setVisibility(View.VISIBLE);
     }
 
     public void showDealerCards(List<String> cards){
@@ -279,6 +278,7 @@ public class MainActivity extends AppCompatActivity {
             cardsString.append(c).append(" ");
         }
         dealerCards.setText(cardsString.toString());
+        dealerCards.setVisibility(View.VISIBLE);
     }
 
     public void showUserWins(String reason){

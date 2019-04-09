@@ -11,6 +11,8 @@ import android.util.Log;
 import com.tudordonca.android.blackjackmvvm.userdata.UserRepository;
 
 import androidx.core.app.NotificationCompat;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class MoneyAlarmReceiver extends BroadcastReceiver {
 
@@ -57,8 +59,16 @@ public class MoneyAlarmReceiver extends BroadcastReceiver {
     private void increaseUserMoney(Context context){
         userRepository = new UserRepository((Application) context.getApplicationContext());
         //TODO: replace with two rxjava operations to get user data and to update the money amount
-        //userRepository.increaseMoney(101);
-        Log.i("Broadcast Receiver", "Received broadcast message, pretending to update user money");
+        Log.i("Broadcast Receiver", "Received broadcast message, updating user money...");
+        userRepository.getUser()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(user -> {
+                    userRepository.updateMoney(user.getUserMoney() + 100);
+                }, throwable -> {
+                    Log.e("BroadcastReceiver", "Failed to update user money in database.");
+                    throwable.printStackTrace();
+                });
 
     }
 }
