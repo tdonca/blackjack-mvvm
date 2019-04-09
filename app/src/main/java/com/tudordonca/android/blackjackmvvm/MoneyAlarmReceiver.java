@@ -17,7 +17,7 @@ public class MoneyAlarmReceiver extends BroadcastReceiver {
     NotificationManager notificationManager;
     UserRepository userRepository;
     // Notification ID.
-    private static final int NOTIFICATION_ID = 0;
+    private static final int NOTIFICATION_ID = 1;
     // Notification channel ID.
     private static final String PRIMARY_CHANNEL_ID =
             "primary_notification_channel";
@@ -58,6 +58,7 @@ public class MoneyAlarmReceiver extends BroadcastReceiver {
         userRepository = new UserRepository((Application) context.getApplicationContext());
         //TODO: replace with two rxjava operations to get user data and to update the money amount
         //userRepository.increaseMoney(101);
+        Log.i("Broadcast Receiver", "Received broadcast message, pretending to update user money");
 
     }
 }

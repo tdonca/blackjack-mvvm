@@ -45,11 +45,11 @@ public class MainActivity extends AppCompatActivity {
     private Button buttonStay;
     private Button buttonNewRound;
 
-    private NotificationManager notificationManager;
-    private Intent notifyIntent;
+    NotificationManager notificationManager;
+
 
     // Notification ID.
-    private static final int NOTIFICATION_ID = 0;
+    private static final int NOTIFICATION_ID = 1;
     // Notification channel ID.
     private static final String PRIMARY_CHANNEL_ID =
             "primary_notification_channel";
@@ -107,40 +107,7 @@ public class MainActivity extends AppCompatActivity {
         viewModel = ViewModelProviders.of(this).get(GameViewModel.class);
         setupUIObservers();
 
-        ///////////////////////////////////////////////////////////////
-        ///////////////////////////////////////////////////////////////
-        notificationManager = (NotificationManager)
-                getSystemService(NOTIFICATION_SERVICE);
-        //Set up the broadcast receiver and alarm manager
-        notifyIntent = new Intent(this, MoneyAlarmReceiver.class);
-
-        boolean alarmUp = (PendingIntent.getBroadcast(this, NOTIFICATION_ID,
-                notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT) != null);
-        // Only register a new alarm if it doesn't yet exist
-        if(!alarmUp){
-            PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
-                    (this, NOTIFICATION_ID, notifyIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT);
-            AlarmManager alarmManager = (AlarmManager) getSystemService
-                    (ALARM_SERVICE);
-
-            long repeatInterval = AlarmManager.INTERVAL_DAY;
-
-            long triggerTime = SystemClock.elapsedRealtime()
-                    + repeatInterval;
-
-            if (alarmManager != null) {
-                alarmManager.setInexactRepeating
-                        (AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                                triggerTime, repeatInterval,
-                                notifyPendingIntent);
-            }
-        }
-
-        // Create the notification channel.
-        createNotificationChannel();
-        //////////////////////////////////////////////////////////////////
-        //////////////////////////////////////////////////////////////////
+        // Alarm Manager Stuff
 
     }
 
@@ -149,6 +116,15 @@ public class MainActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
+        Intent notifyIntent = new Intent(MainActivity.this, MoneyAlarmReceiver.class);
+        boolean alarmUp = (PendingIntent.getBroadcast(MainActivity.this, NOTIFICATION_ID,
+                notifyIntent, PendingIntent.FLAG_NO_CREATE) != null);
+        if(alarmUp){
+            menu.getItem(0).setTitle(R.string.turn_off_deposit);
+        }
+        else{
+            menu.getItem(0).setTitle(R.string.turn_on_deposit);
+        }
         return true;
     }
 
@@ -159,16 +135,45 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+
+        if (id == R.id.deposit_setting) {
+
+            notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-            PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
-                    (this, NOTIFICATION_ID, notifyIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT);
-            if (alarmManager != null) {
-                alarmManager.cancel(notifyPendingIntent);
+            Intent notifyIntent = new Intent(MainActivity.this, MoneyAlarmReceiver.class);
+            boolean alarmUp = (PendingIntent.getBroadcast(MainActivity.this, NOTIFICATION_ID,
+                    notifyIntent, PendingIntent.FLAG_NO_CREATE) != null);
+
+            // Only register a new alarm if it doesn't yet exist
+            if(!alarmUp){
+                PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
+                        (MainActivity.this, NOTIFICATION_ID, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                long repeatInterval = 1000*5;//AlarmManager.INTERVAL_DAY;
+                long triggerTime = SystemClock.elapsedRealtime() + repeatInterval;
+                if (alarmManager != null) {
+                    alarmManager.setInexactRepeating
+                            (AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                                    triggerTime, repeatInterval, notifyPendingIntent);
+                    // enable app notifications.
+                    createNotificationChannel();
+                    //update text
+                    item.setTitle(R.string.turn_off_deposit);
+                    Log.i(LOG_TAG, "Turned on Daily Deposits and notifications");
+                }
             }
-            notificationManager.cancelAll();
+            // Otherwise turn off the alarm
+            else{
+                PendingIntent notifyPendingIntent = PendingIntent.getBroadcast
+                        (MainActivity.this, NOTIFICATION_ID, notifyIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+                if (alarmManager != null) {
+                    alarmManager.cancel(notifyPendingIntent);
+                    notificationManager.cancelAll();
+                    // update text
+                    item.setTitle(R.string.turn_on_deposit);
+                    Log.i(LOG_TAG, "Turned off Daily Deposits and notifications");
+                }
+            }
+
             return true;
         }
 
