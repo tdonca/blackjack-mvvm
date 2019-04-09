@@ -27,8 +27,9 @@ public interface UserDao {
     @Query("SELECT * FROM user_table WHERE userID = :id")
     Observable<User> getUser(String id);
 
-    @Query("SELECT * FROM user_table WHERE userID = :id")
-    User getCurrentUserValue(String id);
+    @Query("SELECT money FROM user_table WHERE userID = :id")
+    int getUserMoney(String id);
+
 
 
 

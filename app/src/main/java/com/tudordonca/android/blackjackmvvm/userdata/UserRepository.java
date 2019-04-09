@@ -20,16 +20,9 @@ public class UserRepository {
     public UserRepository(Application application){
         UserRoomDatabase db = UserRoomDatabase.getDatabase(application);
         userDao = db.userDao();
-        // create a new user on the first startup
-        //User newUser = new User(USERID);
-       // newUser.setUserMoney(100);
-        // on conflict will be ignored
-        //insertUser(newUser);
         // create BehaviorSubject of user
         user = BehaviorSubject.create();
         userDao.getUser(USERID).subscribe(user);
-        // push initial value into BehaviorSubject for downstream
-
     }
 
     // data access/modification wrapper functions that abstract database access
@@ -48,6 +41,9 @@ public class UserRepository {
         new updateMoneyAsyncTask(userDao, USERID).execute(money);
     }
 
+    public void increaseMoney(int amount){
+        new increaseMoneyAsyncTask(userDao, USERID).execute(amount);
+    }
 
 
     private static class insertUserAsyncTask extends AsyncTask<User, Void, Void>{
@@ -75,6 +71,22 @@ public class UserRepository {
         protected Void doInBackground(Integer... integers) {
             userDao.updateUserMoney(userID, integers[0]);
             Log.i("DaoAsyncTask", "just updated the user's money with " + integers[0]);
+            return null;
+        }
+    }
+
+    private static class increaseMoneyAsyncTask extends AsyncTask<Integer, Void, Void>{
+        private UserDao userDao;
+        private String userID;
+        increaseMoneyAsyncTask(UserDao dao, String id){
+            userDao = dao;
+            userID = id;
+        }
+        @Override
+        protected Void doInBackground(Integer... integers) {
+            int money = userDao.getUserMoney(userID);
+            userDao.updateUserMoney(userID, money + integers[0]);
+            Log.i("DaoAsyncTask", "just increased the user's money to: " + (money + integers[0]));
             return null;
         }
     }

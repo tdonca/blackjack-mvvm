@@ -98,6 +98,7 @@ public class GameViewModel extends AndroidViewModel {
         else{
             Log.i(LOG_TAG, "User doesn't have enough money, can't play.");
             UIGameState stateUI = new UIGameState(UIGameState.State.DENIED);
+            stateUI.setUserMoney(userMoney);
             stateUI.setMessage("Not enough money to play. Come back tomorrow.");
             Log.i(LOG_TAG, "Updating UI State...");
             displayUI.setValue(stateUI);
@@ -187,4 +188,6 @@ public class GameViewModel extends AndroidViewModel {
             return uiState;
         }
     }
+
+
 }
