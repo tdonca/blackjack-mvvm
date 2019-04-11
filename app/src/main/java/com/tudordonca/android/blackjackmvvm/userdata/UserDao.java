@@ -6,29 +6,31 @@ import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 
 @Dao
 public interface UserDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertUser(User user);
+    Completable insertUser(User user);
 
     @Update
-    void updateUser(User user);
+    Completable updateUser(User user);
 
     @Query("UPDATE user_table SET money = :userMoney WHERE userID = :id")
-    void updateUserMoney(String id, int userMoney);
+    Completable updateUserMoney(String id, int userMoney);
 
     @Delete
-    void deleteUser(User user);
+    Completable deleteUser(User user);
 
     @Query("SELECT * FROM user_table WHERE userID = :id")
-    Observable<User> getUser(String id);
+    Single<User> getUser(String id);
 
-    @Query("SELECT money FROM user_table WHERE userID = :id")
-    int getUserMoney(String id);
+//    @Query("SELECT money FROM user_table WHERE userID = :id")
+//    Single<int> getUserMoney(String id);
 
 
 

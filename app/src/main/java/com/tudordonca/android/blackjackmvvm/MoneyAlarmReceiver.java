@@ -11,13 +11,15 @@ import android.util.Log;
 import com.tudordonca.android.blackjackmvvm.userdata.UserRepository;
 
 import androidx.core.app.NotificationCompat;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
 
 public class MoneyAlarmReceiver extends BroadcastReceiver {
 
     NotificationManager notificationManager;
     UserRepository userRepository;
     // Notification ID.
-    private static final int NOTIFICATION_ID = 0;
+    private static final int NOTIFICATION_ID = 1;
     // Notification channel ID.
     private static final String PRIMARY_CHANNEL_ID =
             "primary_notification_channel";
@@ -56,7 +58,17 @@ public class MoneyAlarmReceiver extends BroadcastReceiver {
 
     private void increaseUserMoney(Context context){
         userRepository = new UserRepository((Application) context.getApplicationContext());
-        userRepository.increaseMoney(101);
+        //TODO: replace with two rxjava operations to get user data and to update the money amount
+        Log.i("Broadcast Receiver", "Received broadcast message, updating user money...");
+        userRepository.getUser()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(user -> {
+                    userRepository.updateMoney(user.getUserMoney() + 100);
+                }, throwable -> {
+                    Log.e("BroadcastReceiver", "Failed to update user money in database.");
+                    throwable.printStackTrace();
+                });
 
     }
 }
