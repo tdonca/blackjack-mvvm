@@ -1,6 +1,5 @@
-package com.tudordonca.android.blackjackmvvm;
+package com.tudordonca.android.blackjackmvvm.gameplay;
 
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
 
@@ -13,7 +12,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import com.google.android.material.snackbar.Snackbar;
-import com.tudordonca.android.blackjackmvvm.userdata.User;
+import com.tudordonca.android.blackjackmvvm.R;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;

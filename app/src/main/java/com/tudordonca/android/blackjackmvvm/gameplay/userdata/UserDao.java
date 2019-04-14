@@ -1,4 +1,4 @@
-package com.tudordonca.android.blackjackmvvm.userdata;
+package com.tudordonca.android.blackjackmvvm.gameplay.userdata;
 
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 import io.reactivex.Completable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 
 

@@ -1,23 +1,20 @@
-package com.tudordonca.android.blackjackmvvm;
+package com.tudordonca.android.blackjackmvvm.gameplay;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.BehaviorSubject;
 
 import android.app.Application;
 import android.util.Log;
 
-import com.tudordonca.android.blackjackmvvm.gamemechanics.Card;
-import com.tudordonca.android.blackjackmvvm.gamemechanics.GameExecution;
-import com.tudordonca.android.blackjackmvvm.gamemechanics.GameState;
-import com.tudordonca.android.blackjackmvvm.userdata.User;
-import com.tudordonca.android.blackjackmvvm.userdata.UserRepository;
+import com.tudordonca.android.blackjackmvvm.gameplay.gamemechanics.Card;
+import com.tudordonca.android.blackjackmvvm.gameplay.gamemechanics.GameExecution;
+import com.tudordonca.android.blackjackmvvm.gameplay.gamemechanics.GameState;
+import com.tudordonca.android.blackjackmvvm.gameplay.userdata.User;
+import com.tudordonca.android.blackjackmvvm.gameplay.userdata.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;

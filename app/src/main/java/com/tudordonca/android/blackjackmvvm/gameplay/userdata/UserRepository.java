@@ -1,13 +1,9 @@
-package com.tudordonca.android.blackjackmvvm.userdata;
+package com.tudordonca.android.blackjackmvvm.gameplay.userdata;
 
 import android.app.Application;
-import android.os.AsyncTask;
 import android.util.Log;
 
-import androidx.lifecycle.LiveData;
-import androidx.room.RoomDatabase;
 import io.reactivex.Completable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;

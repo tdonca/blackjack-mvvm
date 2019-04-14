@@ -1,4 +1,4 @@
-package com.tudordonca.android.blackjackmvvm.userdata;
+package com.tudordonca.android.blackjackmvvm.gameplay.userdata;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;

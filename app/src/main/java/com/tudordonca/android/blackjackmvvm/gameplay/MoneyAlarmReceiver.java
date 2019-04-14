@@ -1,4 +1,4 @@
-package com.tudordonca.android.blackjackmvvm;
+package com.tudordonca.android.blackjackmvvm.gameplay;
 
 import android.app.Application;
 import android.app.NotificationManager;
@@ -8,7 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.tudordonca.android.blackjackmvvm.userdata.UserRepository;
+import com.tudordonca.android.blackjackmvvm.R;
+import com.tudordonca.android.blackjackmvvm.gameplay.userdata.UserRepository;
 
 import androidx.core.app.NotificationCompat;
 import io.reactivex.android.schedulers.AndroidSchedulers;

@@ -1,4 +1,4 @@
-package com.tudordonca.android.blackjackmvvm;
+package com.tudordonca.android.blackjackmvvm.gameplay;
 
 import java.util.ArrayList;
 import java.util.List;
