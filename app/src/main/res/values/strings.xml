@@ -13,4 +13,5 @@
     <string name="winner_reason_display_text">No reason</string>
     <string name="turn_off_deposit">Turn off daily deposit</string>
     <string name="turn_on_deposit">Turn on daily deposit</string>
+    <string name="store">Store</string>
 </resources>

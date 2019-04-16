@@ -13,6 +13,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 import com.google.android.material.snackbar.Snackbar;
 import com.tudordonca.android.blackjackmvvm.R;
+import com.tudordonca.android.blackjackmvvm.store.StoreActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -132,8 +133,13 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if(id == R.id.store_option){
+            // send intent to store
+            Intent storeIntent = new Intent(MainActivity.this, StoreActivity.class);
+            startActivity(storeIntent);
 
-        if (id == R.id.deposit_setting) {
+        }
+        else if (id == R.id.deposit_setting) {
 
             notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
             AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);

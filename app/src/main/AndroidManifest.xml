@@ -27,7 +27,9 @@
         </activity>
 
         <activity android:name=".store.StoreActivity">
-
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.tudordonca.android.blackjackmvvm.gameplay.MainActivity" />
         </activity>
 
     </application>
